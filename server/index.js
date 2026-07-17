@@ -9,6 +9,18 @@ const PORT = 3000;
 
 const db = require("./database");
 
+const bcrypt = require("bcrypt");
+
+const session = require("express-session");
+
+const path = require("path");
+
+app.use(session({
+    secret: process.env.SESSION_SECRET || "default_secret",
+    resave: false,
+    saveUninitialized: true,
+}));
+
 const PLAYER_COUNT = {
 
     INVALID: 1,
@@ -99,6 +111,16 @@ class Play {
         }
     }
 }
+
+function requireAdmin(req, res, next) {
+    if (!req.session.admin) {
+        return res.redirect("/login.html");
+    }
+    next();
+}
+
+app.use("/admin", requireAdmin);
+
 const games = [
     new Game(1, "Spirit Island", {min: 2, max: 4, preferred: [2,3,4]}, {min: 90, max: 180}, 30, 1, "cooperativeNormal"),
     new Game(2, "Terraforming Mars", {min: 1, max: 5, preferred: [2,3,4], excluded: [1,5]}, {min: 150, max: 330}, 30, 1, "competitive")
@@ -113,6 +135,45 @@ app.get("/games", (req, res) => {
     res.json(games);
     
 });
+
+app.post("/login", async (req, res) => {
+
+    const { username, password } = req.body;
+
+    const [admins] = await db.query(
+        "SELECT * FROM admins WHERE username = ?",
+        [username]
+    );
+    if (admins.length === 0) {
+        return res.status(401).send( "Ungültiger Benutzername oder Passwort" );
+    }
+    const admin = admins[0];
+    const isMatch = await bcrypt.compare(
+        password,
+        admin.passwordHash
+    );
+    if (!isMatch) {
+        return res.status(401).send( "Ungültiger Benutzername oder Passwort" );
+    }
+    req.session.admin = {
+        id: admin.id,
+        username: admin.username
+    };
+    const returnTo = req.session.returnTo || "/admin";
+    delete req.session.returnTo;
+    
+    res.json({
+        success: true,
+        redirect: returnTo
+    });
+
+
+});
+
+app.get("/admin", (req, res) => {
+    res.sendFile(path.join(__dirname, "../public/admin/admin.html"));
+});
+
 
 app.get("/assess", (req, res) => {
 
@@ -165,3 +226,11 @@ app.listen(PORT, () => {
     console.log(`Server läuft auf Port ${PORT}`);
 
 });
+
+//const bcrypt = require("bcrypt");
+
+//const password = "";
+
+//const hash = bcrypt.hashSync(password, 10);
+
+//console.log(hash);
