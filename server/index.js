@@ -15,6 +15,8 @@ const session = require("express-session");
 
 const path = require("path");
 
+let gameList = [];
+
 app.use(session({
     secret: process.env.SESSION_SECRET || "default_secret",
     resave: false,
@@ -114,25 +116,49 @@ class Play {
 
 function requireAdmin(req, res, next) {
     if (!req.session.admin) {
-        return res.redirect("/login.html");
+        return res.redirect("/login/login.html");
     }
     next();
 }
 
 app.use("/admin", requireAdmin);
 
-const games = [
-    new Game(1, "Spirit Island", {min: 2, max: 4, preferred: [2,3,4]}, {min: 90, max: 180}, 30, 1, "cooperativeNormal"),
-    new Game(2, "Terraforming Mars", {min: 1, max: 5, preferred: [2,3,4], excluded: [1,5]}, {min: 150, max: 330}, 30, 1, "competitive")
-];
-
 let players = [];
 
 const terraformingMars1 = new Play(1, 1, ["Paula", "Simon", "Lukas"], 180)
 
-app.get("/games", (req, res) => {
-    
-    res.json(games);
+app.get("/games", async (req, res) => {
+    const [games_data] = await db.query(
+        "SELECT * FROM games"
+    );
+    gameList.length = 0;
+    for (const game_entry of games_data) {
+        const game = new Game(
+            game_entry.id,
+            game_entry.title,
+            {min: game_entry.minPlayers, max: game_entry.maxPlayers},
+            {min: game_entry.minDuration, max: game_entry.maxDuration},
+            game_entry.explainingTime,
+            game_entry.tableCount,
+            game_entry.type
+        );
+        gameList.push(game);
+    }
+    console.log(gameList[0]);
+    for (const game of gameList) {
+        const [preferred_player_count] = await db.query(
+            "SELECT * FROM game_preferred_player_count WHERE game_id = ?",
+            [game.id]
+        );
+        game.playerCount.preferred = preferred_player_count.map(row => row.player_count);
+        const [excluded_player_count] = await db.query(
+            "SELECT * FROM game_excluded_player_count WHERE game_id = ?",
+            [game.id]
+        );
+        game.playerCount.excluded = excluded_player_count.map(row => row.player_count);
+    };
+    console.log(gameList[0]);
+    res.json(gameList);
     
 });
 
@@ -197,28 +223,49 @@ app.get("/assess", (req, res) => {
 app.post("/players", (req, res) => {
     console.log(req.body);
     const { firstName, lastName, rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8 } = req.body;
-    const player = new Player(
-        players.length + 1,
-        req.body.firstName,
-        req.body.lastName,
-        {},
-        {},
-        [req.body.rank1, req.body.rank2, req.body.rank3, req.body.rank4, req.body.rank5, req.body.rank6, req.body.rank7, req.body.rank8]);
-    console.log(player);
     db.query(
         "INSERT INTO players (firstName, lastName, rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [player.firstName, player.lastName, player.rating[0], player.rating[1], player.rating[2], player.rating[3], player.rating[4], player.rating[5], player.rating[6], player.rating[7]],
-        //(err, result) => {
-        //    if (err) {
-        //        console.error("Fehler beim Speichern des Spielers:", err);
-        //        res.status(500).send("Fehler beim Speichern des Spielers");
-        //        return;
-        //    }
-        //    res.send("Spieler gespeichert");
-        
-        //}
+        [req.body.firstName, req.body.lastName, req.body.rank1, req.body.rank2, req.body.rank3, req.body.rank4, req.body.rank5, req.body.rank6, req.body.rank7, req.body.rank8]
     );
     res.json({ message: "Spieler gespeichert" });
+});
+
+app.post("/games", async (req, res) => {
+    console.log(req.body);
+    const { title, minPlayers, maxPlayers, preferredPlayers, excludedPlayers, minDuration, maxDuration, explainingTime, tableCount, type } = req.body;
+    const [result] = await db.query(
+        "INSERT INTO games (title, minPlayers, maxPlayers, minDuration, maxDuration, explainingTime, tableCount, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        [req.body.title, req.body.minPlayers, req.body.maxPlayers, req.body.minDuration, req.body.maxDuration, req.body.explainingTime, req.body.tableCount, req.body.type]
+    );
+    console.log(result.insertId);
+    let values = req.body.preferredPlayers.map(playerCount => [
+        result.insertId,
+        playerCount
+    ]);
+    if (values.length > 0) {
+        db.query(
+            "INSERT INTO game_preferred_player_count (game_id, player_count) VALUES ?",
+            [values]
+        );
+    };
+    values = req.body.excludedPlayers.map(playerCount => [
+        result.insertId,
+        playerCount
+    ]);
+    if (values.length > 0) {
+        db.query(
+            "INSERT INTO game_excluded_player_count (game_id, player_count) VALUES ?",
+            [values]
+        );
+    };
+    res.json({ 
+        message: "Spiel gespeichert",
+        success: true
+    });
+});
+
+app.get("/admin/spiele", (req, res) => {
+    res.sendFile(path.join(__dirname, "../public/games/games.html"));
 });
 
 app.listen(PORT, () => {
