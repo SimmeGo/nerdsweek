@@ -1,75 +1,60 @@
-let games = [];
+import { generateForm } from "/shared/forms.js";
+import { createButton } from "/shared/forms.js";
+import { generateTableHead } from "/shared/forms.js";
+import { generateTableBody} from "/shared/forms.js";
+import { createFieldsForPlayer } from "/shared/forms.js";
+import { addDataToDatabaseButton, createAndShowBackButton } from "../shared/forms.js";
+
+const playersTableButtons = [
+    {name: "editPlayerButton", label: "Bearbeiten", function: () => {window.location.href = "/admin/spiele"}},
+    {name: "deletePlayerButton", label: "Löschen", function: () => {window.location.href = "/admin/spiele"}},
+]
+
 let players = [];
+let fields = [];
+let fieldsWithoutID = [];
 
-async function loadGames() {
-    const response = await fetch("/games");
-    games = await response.json();
-    console.log(games.length);
+const containerID = "formContainer";
+
+function generatePlayersTableBody() {
+    generateTableBody("playersTableBody", "/players", playersTableButtons, fields);
 }
 
-function createDropdown(n) {
-    
-    for (let i = 0; i < games.length; i++) {
-        const game = games[i];
-        const option = document.createElement("option");
-        option.value = game.id;
-        option.textContent = game.title;
-        document.getElementById("rank" + n).appendChild(option);
-    }
-    const noPreference = document.createElement("option");
-    noPreference.value = "0";
-    noPreference.textContent = "keine Präferenz";
-    document.getElementById("rank" + n).appendChild(noPreference);
-}
-
-function multiDropdown() {
-    for (let i = 0; i < 8; i++) {
-        number = i + 1;
-        createDropdown(number);
-    }
-}
-
-async function createPlayer() {
-    const firstName = document.getElementById("firstName").value;
-    const lastName = document.getElementById("lastName").value;
-    const rank1 = document.getElementById("rank1").value;
-    const rank2 = document.getElementById("rank2").value;
-    const rank3 = document.getElementById("rank3").value;
-    const rank4 = document.getElementById("rank4").value;
-    const rank5 = document.getElementById("rank5").value;
-    const rank6 = document.getElementById("rank6").value;
-    const rank7 = document.getElementById("rank7").value;
-    const rank8 = document.getElementById("rank8").value;
-    console.log(firstName, lastName, rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8);
+async function sendPlayerToServer(player_data, playerId, del) {
     const response = await fetch("/players", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            firstName: firstName,
-            lastName: lastName,
-            rank1: rank1,
-            rank2: rank2,
-            rank3: rank3,
-            rank4: rank4,
-            rank5: rank5,
-            rank6: rank6,
-            rank7: rank7,
-            rank8: rank8
+            firstName: player_data[0],
+            lastName: player_data[1],
+            rank1: player_data[2],
+            rank2: player_data[3],
+            rank3: player_data[4],
+            rank4: player_data[5],
+            rank5: player_data[6],
+            rank6: player_data[7],
+            rank7: player_data[8],
+            rank8: player_data[9],
+            playerId: playerId,
+            del: del
         })
     });
-    const result = await response.json();
-    console.log(result);
+    return await response.json();
 }
 
-async function start() {
-    await loadGames();
-    multiDropdown();
-
+function start() {
+    fields = createFieldsForPlayer();
+    fieldsWithoutID = fields.slice(1);
+    generateTableHead("playersTableHead", fields);
+    generatePlayersTableBody();
+    const backButton = createAndShowBackButton("/admin", "playersList", "playerBody");
+    const addPlayerButton = createButton("addPlayerButton", "+", () => {
+        addDataToDatabaseButton(fieldsWithoutID, containerID, "addPlayerToDatabaseButton", "Spieler hinzufügen", generatePlayersTableBody, "Spieler", sendPlayerToServer);
+    });
+    document.getElementById("playersTable");
+    document.getElementById("playersList").insertBefore(addPlayerButton, document.getElementById("playersTable"));
 }
 
 start();
-document
-    .getElementById("submitPlayer")
-    .addEventListener("click", createPlayer);

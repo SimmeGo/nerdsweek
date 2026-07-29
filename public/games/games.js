@@ -1,67 +1,148 @@
-import { generateForm } from "/shared/forms.js";
-import { createButton } from "/shared/forms.js";
+import { addDataToDatabase, deleteDataFromDatabase, editDataInDatabase } from "/shared/data_management.js";
+import { 
+    generateTableHead,
+    generateTableBody,
+    generateForm,
+    createButton, 
+    addDataToDatabaseButton,
+    createAndShowBackButton } from "/shared/forms.js";
 
 let playerCount = [];
 let games = [];
+let gameId = "";
+let fieldsWithoutID = [];
 
-const gameTableColumns = [
-    game => game.id,
-    game => game.title,
-    game => game.playerCount.min,
-    game => game.playerCount.max,
-    game => game.playerCount.preferred?.join(", "),
-    game => game.playerCount.excluded?.join(", "),
-    game => game.duration.min,
-    game => game.duration.max,
-    game => game.explainingTime,
-    game => game.tableCount,
-    game => game.type
+const fields = [
+        { 
+            label: "ID",
+            name: "id",
+            get: game => game.id
+        },
+        { 
+            element: "input", 
+            label: "Titel", 
+            type: "text", 
+            name: "title",
+            get: game => game.title, 
+            mandatory: true 
+        },
+        { 
+            element: "input", 
+            label: "Minimale Spieleranzahl", 
+            type: "number", 
+            name: "minPlayers", 
+            get: game => game.playerCount.min, 
+            mandatory: true 
+        },
+        { 
+            element: "input", 
+            label: "Maximale Spieleranzahl", 
+            type: "number", 
+            name: "maxPlayers", 
+            get: game => game.playerCount.max, 
+            mandatory: true 
+        },
+        {
+            element: "select", 
+            label: "Bevorzugte Spieleranzahl",
+            type: "number", 
+            name: "preferredPlayers", 
+            options: [], 
+            multiple: true, 
+            get: game => game.playerCount.preferred?.join(", ")  },
+        { 
+            element: "select", 
+            label: "Ausgeschlossene Spieleranzahl", 
+            type: "number", 
+            name: "excludedPlayers", 
+            options: [], 
+            multiple: true, 
+            get: game => game.playerCount.excluded?.join(", ") },
+        { 
+            element: "input", 
+            label: "Minimale Spieldauer", 
+            type: "number", 
+            name: "minDuration", 
+            get: game => game.duration.min,
+            mandatory: true
+        },
+        {
+            element: "input", 
+            label: "Maximale Spieldauer", 
+            type: "number", 
+            name: "maxDuration", 
+            get: game => game.duration.max,
+            mandatory: true
+        },
+        {
+            element: "input", 
+            label: "Erklärdauer", 
+            type: "number", 
+            name: "explainingTime", 
+            get: game => game.explainingTime,
+            mandatory: true
+        },
+        {
+            element: "input", 
+            label: "Tischanzahl", 
+            type: "number", 
+            name: "tableCount", 
+            get: game => game.tableCount,
+            mandatory: true
+        },
+        {
+            element: "select", 
+            label: "Typ", 
+            type: "text", 
+            name: "type", 
+            options: ["Koop: leicht", "Koop: normal", "Koop: schwer", "Koop: sehr schwer", "Punkte", "ohne Punkte", "Team"],
+            multiple: false, get: game => game.type,
+            mandatory: true
+        },
+    ];
+
+const containerID = "formContainer";
+
+const editGameButton = createButton("editGameButton", "Bearbeiten", );
+        const deleteGameButton = createButton("deleteGameButton", "Löschen", () => deleteGameFromDatabase(game.id));
+
+const gamesTableButtons = [
+    { name: "editGameButton", label: "Bearbeiten", function: game => editDataInDatabase(containerID, game.id, fieldsWithoutID, games, spawnPlayerCountOnEdit, sendGameToServer, generateGamesTableBody) },
+    { name: "deleteGameButton", label: "Löschen", function: game => deleteDataFromDatabase(games, game.id, generateGamesTableBody, sendGameToServer) }
 ]
 
-async function addGameToDatabase() {
-    const title = document.getElementById("title").value;
-    const minPlayers = document.getElementById("minPlayers").value;
-    const maxPlayers = document.getElementById("maxPlayers").value;
-    const minDuration = document.getElementById("minDuration").value;
-    const maxDuration = document.getElementById("maxDuration").value;
-    const preferredPlayersSelect = document.getElementById("preferredPlayers");
-    const preferredPlayers = Array.from(preferredPlayersSelect.selectedOptions).map(option =>
-        Number(option.value)
-    );
-    const excludedPlayersSelect = document.getElementById("excludedPlayers");
-    const excludedPlayers = Array.from(excludedPlayersSelect.selectedOptions).map(option =>
-        Number(option.value)
-    );
-    const explainingTime = document.getElementById("explainingTime").value;
-    const tableCount = document.getElementById("tableCount").value;
-    const type = document.getElementById("type").value;
-    
+async function sendGameToServer(game_data, gameId, del) {
     const response = await fetch("/games", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            title: title,
-            minPlayers: minPlayers,
-            maxPlayers: maxPlayers,
-            preferredPlayers: preferredPlayers,
-            excludedPlayers: excludedPlayers,
-            minDuration: minDuration,
-            maxDuration: maxDuration,
-            explainingTime: explainingTime,
-            tableCount: tableCount,
-            type: type
+            title: game_data[0],
+            minPlayers: game_data[1],
+            maxPlayers: game_data[2],
+            preferredPlayers: game_data[3],
+            excludedPlayers: game_data[4],
+            minDuration: game_data[5],
+            maxDuration: game_data[6],
+            explainingTime: game_data[7],
+            tableCount: game_data[8],
+            type: game_data[9],
+            gameId: gameId,
+            del: del
         })
     });
-    const result = await response.json();
-    console.log(result);
-    console.log("Game added successfully");
-    document.getElementById(containerID).innerHTML = "Game added successfully!";
+    return await response.json();
 }
 
-function addPlayerCountOptions(dropdownID) {
-    const dropdown = document.getElementById(dropdownID);
+function spawnPlayerCountOnEdit(dropdownId) {
+    createPreferredAndExcludedPlayerCountList();
+    addPlayerCountOptions(dropdownId);
+}
+
+function addPlayerCountOptions(dropdownId) {
+    console.log(dropdownId);
+    const dropdown = document.getElementById(dropdownId);
     const minPlayerCount = Number(document.getElementById("minPlayers").value);
     const maxPlayerCount = Number(document.getElementById("maxPlayers").value);
     const options = [];
@@ -78,13 +159,25 @@ function addPlayerCountOptions(dropdownID) {
     return [minPlayerCount, maxPlayerCount];
 }
 
+function createPreferredAndExcludedPlayerCountList() {
+    if ( Number(document.getElementById("minPlayers").value) !== playerCount[0] || Number(document.getElementById("maxPlayers").value) !== playerCount[1]) {
+        document.getElementById("preferredPlayers").addEventListener("focus", () => {
+            playerCount = addPlayerCountOptions("preferredPlayers");
+        });
+        document.getElementById("excludedPlayers").addEventListener("focus", () => {
+            playerCount = addPlayerCountOptions("excludedPlayers");
+        });
+    }
+}
+
 function addGameToDatabaseButton() {
-    generateForm(fields, containerID);
+    generateForm(fieldsWithoutID, containerID);
     console.log(document.getElementById("preferredPlayers"));
     console.log(document.getElementById("excludedPlayers"));
     const addGameToDatabaseButton = createButton("addGameToDatabase", "Spiel hinzufügen", async () => {
-        await addGameToDatabase();
-        createGameTable();
+        const gameId = 0; // game_id wird später an den Server übergeben. Ist sie 0, sagt dies dem Server, dass das Spiel neu in der Datenbank angelegt werden muss.
+        await addDataToDatabase(gameId, fieldsWithoutID, sendGameToServer, containerID);
+        generateGamesTableBody();
     });
     document.getElementById(containerID).appendChild(addGameToDatabaseButton);
     if ( Number(document.getElementById("minPlayers").value) !== playerCount[0] || Number(document.getElementById("maxPlayers").value) !== playerCount[1]) {
@@ -97,41 +190,20 @@ function addGameToDatabaseButton() {
     }
 }
 
-async function createGameTable() {
-    const gamesTableBody = document.getElementById("gamesTableBody");
-    const response = await fetch("/games");
-    gamesTableBody.innerHTML = "";
-    games = await response.json();
-    games.forEach(game => {
-        const column = document.createElement("tr");
-        gameTableColumns.forEach(getValue => {
-            const cellElement = document.createElement("td");
-            cellElement.textContent = getValue(game) ?? "";
-            column.appendChild(cellElement);
-        });
-        gamesTableBody.appendChild(column);
-    });
-
+async function generateGamesTableBody() {
+    games = await generateTableBody("gamesTableBody", "/games", gamesTableButtons, fields);
 }
 
-const fields = [
-        { element: "input", label: "Titel", type: "text", name: "title" },
-        { element: "input", label: "Minimale Spieleranzahl", type: "number", name: "minPlayers" },
-        { element: "input", label: "Maximale Spieleranzahl", type: "number", name: "maxPlayers" },
-        { element: "select", label: "Bevorzugte Spieleranzahl", type: "number", name: "preferredPlayers", options: [], multiple: true },
-        { element: "select", label: "Ausgeschlossene Spieleranzahl", type: "number", name: "excludedPlayers", options: [], multiple: true },
-        { element: "input", label: "Minimale Spieldauer", type: "number", name: "minDuration" },
-        { element: "input", label: "Maximale Spieldauer", type: "number", name: "maxDuration" },
-        { element: "input", label: "Erklärzeit", type: "number", name: "explainingTime" },
-        { element: "input", label: "Tischanzahl", type: "number", name: "tableCount" },
-        { element: "select", label: "Typ", type: "text", name: "type", options: ["Koop: leicht", "Koop: normal", "Koop: schwer", "Koop: sehr schwer", "Punkte", "ohne Punkte", "Team"], multiple: false }
-    ];
+function start() {
+    fieldsWithoutID = fields.slice(1);
+    const addGameButton = createButton("addGameButton", "+", () => {
+        addDataToDatabaseButton(fieldsWithoutID, containerID, "addGameToDatabaseButton", "Spiel hinzufügen", generateGamesTableBody, "Spiel", sendGameToServer);
+        createPreferredAndExcludedPlayerCountList();
+    });
+    document.getElementById("gameList").insertBefore(addGameButton, document.getElementById("gamesTable"));
+    generateTableHead("gamesTableHead", fields);
+    generateGamesTableBody();
+    createAndShowBackButton("/admin", "gameList", "gameBody");
+}
 
-const containerID = "formContainer";
-const addGameButton = createButton("addGameButton", "+", () => {
-    addGameToDatabaseButton();
-});
-const buttonPosition = document.getElementById("gameTable");
-
-document.getElementById("gameList").insertBefore(addGameButton, buttonPosition);
-createGameTable();
+start();

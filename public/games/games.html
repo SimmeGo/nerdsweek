@@ -2,26 +2,12 @@
     <script type="module" src="/games/games.js" defer></script>
 </head>
 
-<body>
+<body id ="gameBody">
     <h1> Spieleübersicht </h1>
     <p>Hier findest du alle Spiele, die bisher in der Datenbank hinterlegt sind.</p>
     <div id="gameList">
         <table id="gamesTable">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Titel</th>
-                    <th>Min. Spielerzahl</th>
-                    <th>Max. Spielerzahl</th>
-                    <th>Bevorzugte Spielerzahl</th>
-                    <th>Ausgeschlossene Spielerzahl</th>
-                    <th>Min. Spieldauer</th>
-                    <th>Max. Spieldauer</th>
-                    <th>Erklärzeit</th>
-                    <th>Tischanzahl</th>
-                    <th>Typ</th>
-                    <th>Aktionen</th>
-                </tr>
+            <thead id = "gamesTableHead">
             </thead>
             <tbody id="gamesTableBody">
             </tbody>

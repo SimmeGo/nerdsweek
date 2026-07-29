@@ -16,6 +16,7 @@ const session = require("express-session");
 const path = require("path");
 
 let gameList = [];
+let playersList = [];
 
 app.use(session({
     secret: process.env.SESSION_SECRET || "default_secret",
@@ -58,14 +59,22 @@ class Game {
 
 class Player {
 
-    constructor(id, firstName, lastName, availableTimeSlots, data, rating) {
+    constructor(id, firstName, lastName, availableTimeSlots, data, rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8) {
 
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.availableTimeSlots = availableTimeSlots;
         this.data = data;
-        this.rating = rating;
+        this.rank1 = rank1;
+        this.rank2 = rank2;
+        this.rank3 = rank3;
+        this.rank4 = rank4;
+        this.rank5 = rank5;
+        this.rank6 = rank6;
+        this.rank7 = rank7;
+        this.rank8 = rank8
+        
     }
 }
 
@@ -121,6 +130,83 @@ function requireAdmin(req, res, next) {
     next();
 }
 
+async function deleteData(del, dataId, tableName) {
+    if (del) {
+        await db.query(
+            `DELETE FROM ${tableName} WHERE id = ?`,
+            [dataId]
+        );
+        return {
+            success: true,
+            type: "gelöscht"
+        };
+    }
+    return {success: false};
+}
+
+async function createDataEntry(dataId, tableName, firstKey, firstObject) {
+    if (dataId === 0) {
+        console.log(dataId);    
+        const [result] = await db.query(
+            `INSERT INTO ${tableName} (${firstKey}) VALUES (?)`,
+            [firstObject]
+            );
+        console.log(result.insertId);
+        const newDataId = result.insertId;
+        console.log(newDataId);
+        const message = " erfolgreich angelegt!";
+        const returnResult = {
+            dataId: newDataId,
+            message: message,
+            success: true,
+            type: "erstellt"
+        };
+        return returnResult;
+    }
+    return {success: false};
+}
+
+async function writeData(data, dataColumns, tableName, dataId) {
+    let rows;
+    let table;
+    let tableGender;
+    if (tableName === "games") {
+        table = "Spiel";
+        tableGender = "Das"
+    } else if (tableName === "players") {
+        table = "Spieler";
+        tableGender = "Der";
+    };
+    const newEntryResult = await createDataEntry(dataId, tableName, dataColumns[0], data[dataColumns[0]]);
+    let newDataId;
+    if (newEntryResult.success === true) {
+        newDataId = newEntryResult.dataId;
+    } else {
+        newDataId = dataId;
+    };
+    [rows] = await db.query(
+            `SELECT * FROM ${tableName} WHERE id = ?`,
+            [newDataId]
+    );
+    const dataEntry = rows[0];
+    const delResult = await deleteData(data.del, dataId, tableName);
+    if (delResult.success) {
+        return {message: `${tableGender} ${table} ${Object.values(dataEntry)[1]} wurde erfolgreich gelöscht!`, success: delResult.success, del: true};
+    }
+    console.log(`newDataID = ${newDataId}`);
+    for (const column of dataColumns)  {
+        await db.query(
+            `UPDATE ${tableName} SET ${column} = ? WHERE id = ?`,
+            [data[column], newDataId]
+        );
+    };
+    if (!newEntryResult.type) {
+        newEntryResult.type = "bearbeitet";
+    }
+    const message = `${tableGender} ${table} ${Object.values(dataEntry)[1]} wurde erfolgreich ${newEntryResult.type}!`;
+    return { message: message, success: newEntryResult.success, newDataId: newDataId };
+}
+
 app.use("/admin", requireAdmin);
 
 let players = [];
@@ -144,7 +230,6 @@ app.get("/games", async (req, res) => {
         );
         gameList.push(game);
     }
-    console.log(gameList[0]);
     for (const game of gameList) {
         const [preferred_player_count] = await db.query(
             "SELECT * FROM game_preferred_player_count WHERE game_id = ?",
@@ -157,8 +242,35 @@ app.get("/games", async (req, res) => {
         );
         game.playerCount.excluded = excluded_player_count.map(row => row.player_count);
     };
-    console.log(gameList[0]);
     res.json(gameList);
+    
+});
+
+app.get("/players", async (req, res) => {
+    const [players_data] = await db.query(
+        "SELECT * FROM players"
+    );
+    playersList.length = 0;
+    for (const player_entry of players_data) {
+        const player = new Player(
+            player_entry.id,
+            player_entry.firstName,
+            player_entry.lastName,
+            [],
+            [],
+            player_entry.rank1,
+            player_entry.rank2,
+            player_entry.rank3,
+            player_entry.rank4,
+            player_entry.rank5,
+            player_entry.rank6,
+            player_entry.rank7,
+            player_entry.rank8
+        );
+        playersList.push(player);
+    }
+    console.log(playersList[7]);
+    res.json(playersList);
     
 });
 
@@ -220,26 +332,39 @@ app.get("/assess", (req, res) => {
 
 });
 
-app.post("/players", (req, res) => {
+app.post("/players", async (req, res) => {
     console.log(req.body);
-    const { firstName, lastName, rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8 } = req.body;
-    db.query(
-        "INSERT INTO players (firstName, lastName, rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [req.body.firstName, req.body.lastName, req.body.rank1, req.body.rank2, req.body.rank3, req.body.rank4, req.body.rank5, req.body.rank6, req.body.rank7, req.body.rank8]
+    const { firstName, lastName, rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8, playerId, del } = req.body;
+    const playerColumns = Object.keys(req.body).filter(
+        key => !["playerId", "del"].includes(key)
     );
-    res.json({ message: "Spieler gespeichert" });
+    const result = await writeData(req.body, playerColumns, "players", req.body.playerId);
+    res.json(result);
 });
 
 app.post("/games", async (req, res) => {
-    console.log(req.body);
-    const { title, minPlayers, maxPlayers, preferredPlayers, excludedPlayers, minDuration, maxDuration, explainingTime, tableCount, type } = req.body;
-    const [result] = await db.query(
-        "INSERT INTO games (title, minPlayers, maxPlayers, minDuration, maxDuration, explainingTime, tableCount, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [req.body.title, req.body.minPlayers, req.body.maxPlayers, req.body.minDuration, req.body.maxDuration, req.body.explainingTime, req.body.tableCount, req.body.type]
+    const { title, minPlayers, maxPlayers, preferredPlayers, excludedPlayers, minDuration, maxDuration, explainingTime, tableCount, type, gameId, del } = req.body;
+    const gameColumns = Object.keys(req.body).filter(
+        key => !["preferredPlayers", "excludedPlayers", "gameId", "del"].includes(key)
     );
-    console.log(result.insertId);
+    let thisGameId = req.body.gameId;
+    if (thisGameId !== 0)  {
+        const tables = ["game_preferred_player_count", "game_excluded_player_count"];
+        for (const table of tables) {
+            await db.query(
+                `DELETE FROM ${table} WHERE game_id = ?`,
+                [thisGameId]
+            );
+        };
+    };
+    const result = await writeData(req.body, gameColumns, "games", thisGameId);
+    console.log(result);
+    if (result.del) {
+        return res.json(result);
+    }
+    thisGameId = result.newDataId;
     let values = req.body.preferredPlayers.map(playerCount => [
-        result.insertId,
+        thisGameId,
         playerCount
     ]);
     if (values.length > 0) {
@@ -249,7 +374,7 @@ app.post("/games", async (req, res) => {
         );
     };
     values = req.body.excludedPlayers.map(playerCount => [
-        result.insertId,
+        thisGameId,
         playerCount
     ]);
     if (values.length > 0) {
@@ -258,14 +383,15 @@ app.post("/games", async (req, res) => {
             [values]
         );
     };
-    res.json({ 
-        message: "Spiel gespeichert",
-        success: true
-    });
+    res.json(result);
 });
 
 app.get("/admin/spiele", (req, res) => {
     res.sendFile(path.join(__dirname, "../public/games/games.html"));
+});
+
+app.get("/admin/teilnehmer", (req,res) => {
+    res.sendFile(path.join(__dirname, "../public/player/player.html"));
 });
 
 app.listen(PORT, () => {
