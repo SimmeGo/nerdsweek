@@ -5,7 +5,7 @@ const adminBody = document.getElementById("adminBody");
 const buttons = [
     {name: "viewGamesButton", label: "Spiele ansehen", relocate: () => {window.location.href = "/admin/spiele"}},
     {name: "viewPlayersButton", label: "Teilnehmer ansehen", relocate: () => {window.location.href = "/admin/teilnehmer"}},
-    {name: "viewRankingsButton", label: "Spieleranking ansehen", relocate: () => {}},
+    {name: "viewRankingsButton", label: "Spieleranking ansehen", relocate: () => {window.location.href = "/admin/spieleranking"}},
     {name: "planNerdsweekButton", label: "Nerdsweek planen", relocate: () => {}},
     {name: "logoutButton", label: "Logout", relocate: () => {}}
 ]

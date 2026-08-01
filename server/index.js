@@ -394,6 +394,10 @@ app.get("/admin/teilnehmer", (req,res) => {
     res.sendFile(path.join(__dirname, "../public/player/player.html"));
 });
 
+app.get("/admin/spieleranking", (req,res) => {
+    res.sendFile(path.join(__dirname, "../public/ranking/ranking.html"));
+});
+
 app.listen(PORT, () => {
 
     console.log(`Server läuft auf Port ${PORT}`);

@@ -1,4 +1,4 @@
-import { addDataToDatabase } from "/shared/data_management.js";
+import { addDataToDatabase, getValues, refreshValues, translateValues } from "/shared/data_management.js";
 
 export function createButton(id, label, onClick) {
     const button = document.createElement("button");
@@ -38,13 +38,15 @@ export function generateForm(fields, containerID) {
             if ( field.multiple ) {
                 select.multiple = true; // Allow multiple selections
             }
-            field.options.forEach((option, index) => {
-                const optionElement = document.createElement("option");
-                optionElement.value = option;
-                optionElement.textContent = option;
-                optionElement.focus
-                select.appendChild(optionElement);
-            });
+            if (field.options !== "") {
+                field.options.forEach((option, index) => {
+                    const optionElement = document.createElement("option");
+                    optionElement.value = option;
+                    optionElement.textContent = option;
+                    optionElement.focus
+                    select.appendChild(optionElement);
+                });
+            };
             div.appendChild(select);
         } else if (field.element === "input") {
             const input = document.createElement("input");
@@ -62,23 +64,28 @@ export function generateForm(fields, containerID) {
 export function createFieldsForPlayer() {
     let fields = [
         { name: "id", label: "ID", get: player => player.id },
-        { element: "input", type: "text", name: "name", label: "Vorname", get: player => player.firstName},
-        { element: "input", type: "text", name: "surname", label: "Nachname", get: player => player.lastName}
+        { element: "input", type: "text", name: "name", label: "Vorname", get: player => player.firstName, mandatory: true},
+        { element: "input", type: "text", name: "surname", label: "Nachname", get: player => player.lastName, mandatory: true}
     ]
     for (let i = 1; i <= 8; i++) {
-        fields.push({ element: "select", type: "text", name: `rank${i}`, label: `Rang ${i}`, get: player => player["rank" + i], options: "" });    
+        fields.push({ element: "select", type: "text", name: `rank${i}`, label: `Rang ${i}`, get: player => player["rank" + i], options: "", mandatory: true });    
     }
     console.log(fields);
     return fields;
 }
 
-export function generateTableHead(tableHeadID, fields) {
+export function generateTableHead(tableHeadID, fields, values, tableFunction) {
     const tableHead = document.getElementById(tableHeadID);
     const headTr = document.createElement("tr");
     headTr.id = "headrow";
     fields.forEach(field => {
         const cellElement = document.createElement("th");
         cellElement.textContent = field.label;
+        cellElement.addEventListener("click", () => {
+            console.log(values);
+            const sortedValues = values.sort(field.sort);
+            tableFunction(sortedValues);
+        });
         headTr.appendChild(cellElement);
     });
     const cellElement = document.createElement("th");
@@ -87,12 +94,26 @@ export function generateTableHead(tableHeadID, fields) {
     tableHead.appendChild(headTr);
 }
 
-export async function generateTableBody(tableBodyID, fetchDestination, buttons, fields) {
+export async function generateTableBody(tableBodyID, dataType, buttons, fields, translate) {
     const tableBody = document.getElementById(tableBodyID);
-    const response = await fetch(fetchDestination);
+    let translatedValues = [];
+    let values;
+    //const response = await fetch(fetchDestination);
     tableBody.innerHTML = "";
-    const values = await response.json();
-    values.forEach(value => {
+    if (Array.isArray(dataType)) {
+        values = dataType;
+    } else {
+        await refreshValues(dataType);
+        values = await getValues(dataType); //await response.json();
+    }
+    
+    if ( translate ) {
+        translatedValues = translateValues(values, dataType);
+    } else {
+        translatedValues = values;
+    }
+    console.log(fields);
+    translatedValues.forEach(value => {
         const column = document.createElement("tr");
         fields.forEach(getValue => {
             const cellElement = document.createElement("td");
@@ -107,7 +128,7 @@ export async function generateTableBody(tableBodyID, fetchDestination, buttons, 
         column.appendChild(cellElement);
         tableBody.appendChild(column);
     });
-    return values;
+    return translatedValues;
 }
 
 export function addDataToDatabaseButton(fields, containerID, buttonID, buttonLabel, tableFunction, dataType, sendFunction) {

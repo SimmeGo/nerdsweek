@@ -1,0 +1,118 @@
+import { generateTableBody, generateTableHead, createAndShowBackButton } from "../shared/forms.js";
+import { refreshValues, getValues } from "../shared/data_management.js";
+
+let players = [];
+let games = [];
+let ratings = [];
+let values = [];
+
+const containerID = "formContainer";
+
+const fields = [
+        {
+            label: "ID",
+            name: "id",
+            get: ranking => ranking.id,
+            sort: (a, b) => a.id - b.id
+        },
+        { 
+            label: "Spiel", 
+            name: "game",
+            get: ranking => ranking.title, 
+            sort: (a, b) => a.title.localeCompare(b.title)
+        },
+        { 
+            label: "Punkte", 
+            name: "points",
+            get: ranking => ranking.rating,
+            sort: (a, b) => b.rating - a.rating
+        },
+        { 
+            label: "Anzahl der Spieler", 
+            name: "playerChoiceCount",
+            get: ranking => ranking.playerCount,
+            sort: (a, b) => b.playerCount - a.playerCount
+        }
+];
+
+const rankingTableButtons = [
+    {name: "showPlayersButton", label: "Spieler anzeigen", function: ranking => { showPlayersOfGame(ranking.id) }},
+]
+
+function showPlayersOfGame(gameId) {
+    const playersOfGame = ratings[1][gameId];
+    const playerNames = playersOfGame.map(playerId => {
+        const player = players.find(p => p.id === playerId);
+        const playerRating = Object.entries(player).find(([key, value]) => key.includes("rank") && value === gameId);
+        return `${player.firstName} ${player.lastName} - Rang ${playerRating[0].replace("rank", "")}`;
+    });
+    alert(`Spieler, die dieses Spiel gewählt haben:\n\n${playerNames.join("\n")}`);
+}
+
+function generateRankingTableBody(values) {
+    generateTableBody("rankingTableBody", values, rankingTableButtons, fields, false);
+}
+
+function createTableValues() {
+    let values = [];
+    const gamesRating = ratings[0];
+    const playersChoseGame = ratings[1];
+    games.forEach(game => {
+        let object = {};
+        object["id"] = game.id;
+        object["title"] = game.title;
+        object["rating"] = Object.entries(gamesRating).find(
+            ([key, value]) => Number(key) === game.id
+        )?.[1];
+        object["playerCount"] = Object.entries(playersChoseGame).find(
+            ([key, value]) => Number(key) === game.id
+        )?.[1].length;
+        values.push(object);
+    })
+    return values;
+}
+
+function calculateRatings() {
+    let gamesRating = {};
+    let playersChoseGame = {};
+    games.forEach(game => {
+        let points = 0;
+        let playersChoseThisGame = [];
+        players.forEach(player => {
+            const ranks = Object.fromEntries(Object.entries(player).filter(
+                ([key]) => key.includes("rank")
+            ));
+            //const playersChoseGame = player.filter(choice => choice.key.includes("rank") === game.id);
+            for (const [key, value] of Object.entries(ranks)) {
+                if (value === game.id) {
+                    const pointsOfPlayer = 9 - Number(key.replace("rank", ""));
+                    points = points + pointsOfPlayer;
+                    playersChoseThisGame.push(player.id);
+                }
+            };   
+        });
+        gamesRating[game.id] = points;
+        playersChoseGame[game.id] = playersChoseThisGame;
+    });
+    return [gamesRating, playersChoseGame];
+}
+
+function countPlayerChoice() {
+
+}
+
+async function start() {
+    await refreshValues("games");
+    games = await getValues("games");
+    await refreshValues("players");
+    players = await getValues("players");
+    ratings = calculateRatings();
+    values = createTableValues();
+    console.log(players);
+    console.log(games);
+    generateTableHead("rankingTableHead", fields, values, generateRankingTableBody);
+    generateRankingTableBody(values);
+    const backButton = createAndShowBackButton("/admin", "rankingList", "rankingBody");
+}
+
+start();
