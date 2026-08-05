@@ -136,9 +136,33 @@ export function addDataToDatabaseButton(fields, containerID, buttonID, buttonLab
     generateForm(fields, containerID);
     const formContainer = document.getElementById(containerID);
     const addDataToDatabaseButton = createButton(buttonID, buttonLabel, async () => {
-        const dataId = 0; // dataId wird später an den Server übergeben. Ist sie 0, sagt dies dem Server, dass das Spiel neu in der Datenbank angelegt werden muss.
+        const dataId = 0; // dataId wird später an den Server übergeben. Ist sie 0, sagt dies dem Server, dass der Datensatz neu in der Datenbank angelegt werden muss.
         await addDataToDatabase(dataId, fields, sendFunction, containerID);
         tableFunction();
     });
     document.getElementById(containerID).appendChild(addDataToDatabaseButton);
+}
+
+export function calculateRatings(games, players) {
+    let gamesRating = {};
+    let playersChoseGame = {};
+    games.forEach(game => {
+        let points = 0;
+        let playersChoseThisGame = [];
+        players.forEach(player => {
+            const ranks = Object.fromEntries(Object.entries(player).filter(
+                ([key]) => key.includes("rank")
+            ));
+            for (const [key, value] of Object.entries(ranks)) {
+                if (value === game.id) {
+                    const pointsOfPlayer = 9 - Number(key.replace("rank", ""));
+                    points = points + pointsOfPlayer;
+                    playersChoseThisGame.push(player.id);
+                }
+            };   
+        });
+        gamesRating[game.id] = points;
+        playersChoseGame[game.id] = playersChoseThisGame;
+    });
+    return [gamesRating, playersChoseGame];
 }

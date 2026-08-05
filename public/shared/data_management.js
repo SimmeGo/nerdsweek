@@ -28,7 +28,9 @@ export function translateValues(values) {
             let textContent = "";
             if (key.includes("rank") && value !== 0) {
                 const game = dataStore.games.find(game => game.id === value);
-                textContent = game.title;
+                if (game) {
+                    textContent = game.title;
+                };
             } else if (value === 0) {
                 textContent = "keine Präferenz";
             } else {
@@ -58,7 +60,9 @@ export async function addDataToDatabase(dataId, fields, sendFunction, containerI
 
 export function editDataInDatabase(containerID, dataId, fields, data, multipleFunction, sendFunction, tableFunction, optionalFunction) {
     generateForm(fields, containerID, optionalFunction);
-    optionalFunction();
+    if (optionalFunction) {
+        optionalFunction();
+    }
     const formContainer = document.getElementById(containerID);
     const dataEntry = data.find(dataEntry => dataEntry.id === dataId);
     fields.forEach(element => {
@@ -102,7 +106,6 @@ export async function deleteDataFromDatabase(data, dataId, tableFunction, sendFu
 
 export function getValuesfromForm(fields) {
     let values = [];
-    console.log(fields);
     for (const field of fields) {
         console.log(`Der Wert von ${field.name} ist ${document.getElementById(field.name).value}.`);
         if ( document.getElementById(field.name).value === "" || document.getElementById(field.name).value === "-1" ) {
@@ -114,7 +117,6 @@ export function getValuesfromForm(fields) {
                 document.getElementById(field.name).value = 0;
             }
         }
-        
         if ( field.multiple ) {
             const multipleSelect = document.getElementById(field.name);
             values.push(Array.from(multipleSelect.selectedOptions).map(option =>

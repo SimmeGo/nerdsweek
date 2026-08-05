@@ -56,7 +56,9 @@ async function createPlayer() {
             rank5: rank5,
             rank6: rank6,
             rank7: rank7,
-            rank8: rank8
+            rank8: rank8,
+            playerId: 0,
+            del: false
         })
     });
     const result = await response.json();

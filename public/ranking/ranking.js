@@ -1,4 +1,4 @@
-import { generateTableBody, generateTableHead, createAndShowBackButton } from "../shared/forms.js";
+import { generateTableBody, generateTableHead, createAndShowBackButton, calculateRatings } from "../shared/forms.js";
 import { refreshValues, getValues } from "../shared/data_management.js";
 
 let players = [];
@@ -72,30 +72,7 @@ function createTableValues() {
     return values;
 }
 
-function calculateRatings() {
-    let gamesRating = {};
-    let playersChoseGame = {};
-    games.forEach(game => {
-        let points = 0;
-        let playersChoseThisGame = [];
-        players.forEach(player => {
-            const ranks = Object.fromEntries(Object.entries(player).filter(
-                ([key]) => key.includes("rank")
-            ));
-            //const playersChoseGame = player.filter(choice => choice.key.includes("rank") === game.id);
-            for (const [key, value] of Object.entries(ranks)) {
-                if (value === game.id) {
-                    const pointsOfPlayer = 9 - Number(key.replace("rank", ""));
-                    points = points + pointsOfPlayer;
-                    playersChoseThisGame.push(player.id);
-                }
-            };   
-        });
-        gamesRating[game.id] = points;
-        playersChoseGame[game.id] = playersChoseThisGame;
-    });
-    return [gamesRating, playersChoseGame];
-}
+
 
 function countPlayerChoice() {
 
@@ -106,7 +83,7 @@ async function start() {
     games = await getValues("games");
     await refreshValues("players");
     players = await getValues("players");
-    ratings = calculateRatings();
+    ratings = calculateRatings(games, players);
     values = createTableValues();
     console.log(players);
     console.log(games);

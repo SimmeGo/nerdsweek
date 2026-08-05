@@ -1,4 +1,4 @@
-import { addDataToDatabase, deleteDataFromDatabase, editDataInDatabase, getGames } from "/shared/data_management.js";
+import { addDataToDatabase, deleteDataFromDatabase, editDataInDatabase, getValues } from "/shared/data_management.js";
 import { 
     generateTableHead,
     generateTableBody,
@@ -107,7 +107,7 @@ const editGameButton = createButton("editGameButton", "Bearbeiten", );
 const deleteGameButton = createButton("deleteGameButton", "Löschen", () => deleteGameFromDatabase(game.id));
 
 const gamesTableButtons = [
-    { name: "editGameButton", label: "Bearbeiten", function: game => editDataInDatabase(containerID, game.id, fieldsWithoutID, games, spawnPlayerCountOnEdit, sendGameToServer, generateGamesTableBody) },
+    { name: "editGameButton", label: "Bearbeiten", function: game => editDataInDatabase(containerID, game.id, fieldsWithoutID, games, spawnPlayerCountOnEdit, sendGameToServer, generateGamesTableBody, false) },
     { name: "deleteGameButton", label: "Löschen", function: game => deleteDataFromDatabase(games, game.id, generateGamesTableBody, sendGameToServer) }
 ]
 

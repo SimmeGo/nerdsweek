@@ -78,51 +78,6 @@ class Player {
     }
 }
 
-class timeSlot {
-
-    constructor(id, date, startTime, playCount) {
-
-        this.id = id;
-        this.date = date;
-        this.startTime = startTime;
-        this.playCount = playCount;
-
-    }
-    assignGame(game) {}
-
-}
-
-class Play {
-
-    constructor(id, timeSlot, players, duration) {
-
-        this.id = id;
-        this.timeSlot = timeSlot;
-        this.players = players;
-        this.duration = duration;
-    }
-
-    calculateScore() {}
-
-    assessPlayerCount(playerCount) {
-        
-        if (this.players.length >= playerCount.min && this.players.length <= playerCount.max) {
-            if (playerCount.preferred && playerCount.preferred.includes(this.players.length)) {
-                return PLAYER_COUNT.PREFERRED;
-            }
-            else if (playerCount.excluded && playerCount.excluded.includes(this.players.length)) {
-                return PLAYER_COUNT.INVALID;
-            }
-            else {
-                return PLAYER_COUNT.OK;
-            }
-        }
-        else {
-            return PLAYER_COUNT.INVALID;
-        }
-    }
-}
-
 function requireAdmin(req, res, next) {
     if (!req.session.admin) {
         return res.redirect("/login/login.html");
@@ -210,8 +165,6 @@ async function writeData(data, dataColumns, tableName, dataId) {
 app.use("/admin", requireAdmin);
 
 let players = [];
-
-const terraformingMars1 = new Play(1, 1, ["Paula", "Simon", "Lukas"], 180)
 
 app.get("/games", async (req, res) => {
     const [games_data] = await db.query(
@@ -396,6 +349,10 @@ app.get("/admin/teilnehmer", (req,res) => {
 
 app.get("/admin/spieleranking", (req,res) => {
     res.sendFile(path.join(__dirname, "../public/ranking/ranking.html"));
+});
+
+app.get("/admin/nerdsweekplanung", (req,res) => {
+    res.sendFile(path.join(__dirname, "../public/createPlan/createPlan.html"));
 });
 
 app.listen(PORT, () => {

@@ -37,7 +37,9 @@ function createGamesOptions() {
         games.forEach( game => {
             option = document.createElement("option");
             option.value = game.id;
-            option.textContent = game.title;
+            if (game.id) { // Fehler muss angezeigt werden!
+                option.textContent = game.title;
+            }
             select.appendChild(option);
         });
         option = document.createElement("option");
