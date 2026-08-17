@@ -1,16 +1,38 @@
 import { addDataToDatabase, getValues, refreshValues, translateValues } from "/shared/data_management.js";
 
-export function createButton(id, label, onClick) {
+export function createButton(id, label, contentType, cssClass, onClick) {
+    console.log(label);
     const button = document.createElement("button");
     button.id = id;
-    button.textContent = label;
+    //button.textContent = label;
+    button.className = cssClass;
     button.addEventListener("click", onClick);
+    let content;
+    if (contentType === "text") {
+        content = document.createElement("span");
+        content.textContent = label;
+    } else if (contentType === "image") {
+        content = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        content.setAttribute("viewBox", "0 0 24 24");
+        content.setAttribute("aria-hidden", "true");
+        content.setAttribute("fill", "none");
+        content.setAttribute("stroke", "currentColor");
+        content.setAttribute("stroke-linecap", "round");
+        content.setAttribute("stroke-linejoin", "round");
+        content.setAttribute("stroke-width", "1.8");
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", label);
+        path.setAttribute("stroke", "currentColor");
+        content.appendChild(path);
+    }
+    button.appendChild(content);
     return button;
 }
 
-export function createAndShowBackButton(destination, insertBefore, bodyId) {
-    const backButton = createButton("backButton", "<", () => {window.location.pathname = destination});
-    document.getElementById(bodyId).insertBefore(backButton, document.getElementById(insertBefore));
+export function createAndShowBackButton(destination, bodyId) {
+    const backSvg = "M17.6 5.8 11.5 12l6.1 6.2m-5-12.4L6.5 12l6.1 6.2";
+    const backButton = createButton("backButton", backSvg, "image", "roundButton", () => {window.location.pathname = destination});
+    document.getElementById(bodyId).appendChild(backButton);
 }
 
 export function generateForm(fields, containerID) {
@@ -23,6 +45,7 @@ export function generateForm(fields, containerID) {
     fields.forEach(field => {
         const div = document.createElement("div");
         const label = document.createElement("label");
+        label.className = field.class;
         if ( field.mandatory ) {
             label.textContent = `${field.label}*`
         } else {
@@ -35,6 +58,7 @@ export function generateForm(fields, containerID) {
             const select = document.createElement("select");
             select.name = field.name;
             select.id = field.name;
+            select.className = field.class;
             if ( field.multiple ) {
                 select.multiple = true; // Allow multiple selections
             }
@@ -53,6 +77,7 @@ export function generateForm(fields, containerID) {
             input.type = field.type;
             input.name = field.name;
             input.id = field.name;
+            input.className = field.class;
             div.appendChild(input);
         }
         form.appendChild(div);
@@ -122,7 +147,7 @@ export async function generateTableBody(tableBodyID, dataType, buttons, fields, 
             });
         const cellElement = document.createElement("td");
         buttons.forEach(button => {
-            const newButton = createButton(button.name, button.label, () => button.function(value));
+            const newButton = createButton(button.name, button.label, button.contentType, "", () => button.function(value));
             cellElement.appendChild(newButton);
             })
         column.appendChild(cellElement);
@@ -135,7 +160,7 @@ export function addDataToDatabaseButton(fields, containerID, buttonID, buttonLab
     //const fieldsWithoutID = fields.slice(1);
     generateForm(fields, containerID);
     const formContainer = document.getElementById(containerID);
-    const addDataToDatabaseButton = createButton(buttonID, buttonLabel, async () => {
+    const addDataToDatabaseButton = createButton(buttonID, buttonLabel, "text", "", async () => {
         const dataId = 0; // dataId wird später an den Server übergeben. Ist sie 0, sagt dies dem Server, dass der Datensatz neu in der Datenbank angelegt werden muss.
         await addDataToDatabase(dataId, fields, sendFunction, containerID);
         tableFunction();
@@ -155,7 +180,7 @@ export function calculateRatings(games, players) {
             ));
             for (const [key, value] of Object.entries(ranks)) {
                 if (value === game.id) {
-                    const pointsOfPlayer = 9 - Number(key.replace("rank", ""));
+                    const pointsOfPlayer = Math.round( (9 - Number(key.replace("rank", ""))) ** (1 / 1.5) * 100);
                     points = points + pointsOfPlayer;
                     playersChoseThisGame.push(player.id);
                 }
@@ -165,4 +190,15 @@ export function calculateRatings(games, players) {
         playersChoseGame[game.id] = playersChoseThisGame;
     });
     return [gamesRating, playersChoseGame];
+}
+
+export function shuffle(array) {
+    const shuffled = [...array];
+
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    return shuffled;
 }

@@ -1,0 +1,203 @@
+@font-face {
+    font-family: "Type Light Sans";
+    src: url("../fonts/TypeLightSans-KV84p.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Unitblock";
+    src: url("../fonts/Unitblock-JpJma.woff2") format("woff2");
+}
+
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+:root {
+    --primCol: #0a5753;
+    --primColLight: #7fc7c5;
+    --primColLighter: #a0eadf;
+    --bgCol: #af6f79;
+    --bgColLight: #e2b1b5;
+    font-family: "Type Light Sans";
+}
+
+.container {
+    width: 100%;
+    max-width: 60rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+}
+
+button {
+    color: var(--primCol);
+    background-color: var(--bgCol);
+    font-family: "Type Light Sans";
+    font-size: 20px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+button:hover {
+    color: var(--bgCol);
+    background-color: var(--primCol);
+}
+
+button span {
+  transform: translateX(1px) translateY(2px);
+}
+
+button svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+
+.roundButton {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    padding: 0;
+    /*margin: 10px 10px;
+    /* font-family: "Unitblock";*/
+    font-size: 20px;
+    
+}
+
+
+html {
+    font-family: "Type Light Sans";
+    font-size: 20px;
+    background-color: var(--primColLighter);
+}
+
+@media (max-width: 600px) {
+    html {
+        font-size: 16px;
+    }
+
+}
+
+h1 {
+    font-family: "Unitblock";
+    font-size: 40px;
+}
+
+div {
+    font-family: "Type Light Sans";
+    font-size: 20px;
+}
+
+input {
+    font-family: "Type Light Sans";
+    font-size: 20px;
+}
+
+select {
+    font-family: "Type Light Sans";
+    font-size: 20px;
+}
+
+.borderedContainer {
+    border: 2px solid var(--primCol);
+    border-radius: 10px;
+}
+
+/* table appearence */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--primColLighter);
+}
+
+th,
+td {
+    padding: 0.77rem;
+    text-align: center;
+    border-bottom: 2px solid var(--primCol);
+}
+
+th {
+    color: var(--primCol);
+    background-color: var(--bgCol);
+    position: sticky;
+}
+
+tr:nth-child(even) {
+    background-color: var(--primColLight);
+}
+
+tr:hover {
+    background-color: var(--bgColLight);
+}
+
+table button {
+    margin-right: 10px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+.table-scroll table {
+  min-width: 700px; /* je nach Inhalt */
+  border-collapse: collapse;
+}
+
+.table-scroll::before {
+  content: "← Tabelle seitlich wischen →";
+  display: block;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--primCol);
+}
+
+input, select {
+    background-color: var(--bgColLight);
+    border-radius: 0;
+}
+
+.inner-edge {
+    position: relative;
+}
+
+.inner-edge::after,
+.inner-edge::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.inner-edge::before {
+    border-top: 3px solid rgba(255, 255, 255, 0.8);
+    border-left: 3px solid rgba(255, 255, 255, 0.8);
+
+    clip-path: polygon(
+        0 0,
+        100% 0,
+        calc(100% - 3px) 3px,
+        3px 3px,
+        3px calc(100% - 3px),
+        0 100%
+    );
+}
+
+.inner-edge::after {
+    border-bottom: 3px solid rgba(52, 10, 87, 0.8);
+    border-right: 3px solid rgba(52, 10, 87, 0.8);
+
+    clip-path: polygon(
+        100% 100%,
+        100% 0,
+        calc(100% - 3px) 3px,
+        calc(100% - 3px) calc(100% - 3px),
+        3px calc(100% - 3px),
+        0 100%
+    );
+}

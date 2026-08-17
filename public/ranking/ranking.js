@@ -36,7 +36,7 @@ const fields = [
 ];
 
 const rankingTableButtons = [
-    {name: "showPlayersButton", label: "Spieler anzeigen", function: ranking => { showPlayersOfGame(ranking.id) }},
+    {name: "showPlayersButton", label: "Spieler anzeigen", contentType: "text", function: ranking => { showPlayersOfGame(ranking.id) }},
 ]
 
 function showPlayersOfGame(gameId) {
@@ -89,7 +89,7 @@ async function start() {
     console.log(games);
     generateTableHead("rankingTableHead", fields, values, generateRankingTableBody);
     generateRankingTableBody(values);
-    const backButton = createAndShowBackButton("/admin", "rankingList", "rankingBody");
+    const backButton = createAndShowBackButton("/admin", "rankingButtons");
 }
 
 start();

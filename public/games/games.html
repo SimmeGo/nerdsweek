@@ -1,11 +1,16 @@
 <head>
     <script type="module" src="/games/games.js" defer></script>
+    <link rel="stylesheet" href="/shared/global.css">
+    <link rel="stylesheet" href="/games/games.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body id ="gameBody">
     <h1> Spieleübersicht </h1>
     <p>Hier findest du alle Spiele, die bisher in der Datenbank hinterlegt sind.</p>
-    <div id="gameList">
+    <div id="gameButtons"></div>
+    <div id="formContainer"></div>
+    <div id="gameList" class="borderedContainer table-scroll">
         <table id="gamesTable">
             <thead id = "gamesTableHead">
             </thead>
@@ -13,5 +18,4 @@
             </tbody>
         </table>
     </div>
-    <div id="formContainer"></div>
 </body>

@@ -1,11 +1,11 @@
-import { addDataToDatabase, deleteDataFromDatabase, editDataInDatabase, getValues } from "/shared/data_management.js";
+import { addDataToDatabase, deleteDataFromDatabase, editDataInDatabase, getValues } from "../shared/data_management.js";
 import { 
     generateTableHead,
     generateTableBody,
     generateForm,
     createButton, 
     addDataToDatabaseButton,
-    createAndShowBackButton } from "/shared/forms.js";
+    createAndShowBackButton } from "../shared/forms.js";
 
 let playerCount = [];
 let games = [];
@@ -103,12 +103,16 @@ const fields = [
 
 const containerID = "formContainer";
 
-const editGameButton = createButton("editGameButton", "Bearbeiten", );
-const deleteGameButton = createButton("deleteGameButton", "Löschen", () => deleteGameFromDatabase(game.id));
+const editSvg = "M10 22h12M15 6l3 3M5 16l3 3m-.34 1.113L22 5.773 18.226 2 3.886 16.34 2 22l5.66-1.887Z";
+const deleteSvg= "M3 5.5h18m-2 0-.5 14.375c0 1.063-1 2.125-2 2.125h-9c-1 0-2-1.063-2-2.125L5 5.5m5 5V17m4-6.5V17M8.5 5.5V3.75c0-.875.875-1.75 1.75-1.75h3.5c.875 0 1.75.875 1.75 1.75V5.5";
+const addSvg = "M21 12H3m9-9v18";
+
+//const editGameButton = createButton("editGameButton", "Bearbeiten", "", );
+//const deleteGameButton = createButton("deleteGameButton", "Löschen", "", () => deleteGameFromDatabase(game.id));
 
 const gamesTableButtons = [
-    { name: "editGameButton", label: "Bearbeiten", function: game => editDataInDatabase(containerID, game.id, fieldsWithoutID, games, spawnPlayerCountOnEdit, sendGameToServer, generateGamesTableBody, false) },
-    { name: "deleteGameButton", label: "Löschen", function: game => deleteDataFromDatabase(games, game.id, generateGamesTableBody, sendGameToServer) }
+    { name: "editGameButton", label: editSvg, contentType: "image", function: game => editDataInDatabase(containerID, game.id, fieldsWithoutID, games, spawnPlayerCountOnEdit, sendGameToServer, generateGamesTableBody, false) },
+    { name: "deleteGameButton", label: deleteSvg, contentType: "image", function: game => deleteDataFromDatabase(games, game.id, generateGamesTableBody, sendGameToServer) }
 ]
 
 async function sendGameToServer(game_data, gameId, del) {
@@ -174,7 +178,7 @@ function addGameToDatabaseButton() {
     generateForm(fieldsWithoutID, containerID);
     console.log(document.getElementById("preferredPlayers"));
     console.log(document.getElementById("excludedPlayers"));
-    const addGameToDatabaseButton = createButton("addGameToDatabase", "Spiel hinzufügen", async () => {
+    const addGameToDatabaseButton = createButton("addGameToDatabase", "Spiel hinzufügen", "text", "", async () => {
         const gameId = 0; // game_id wird später an den Server übergeben. Ist sie 0, sagt dies dem Server, dass das Spiel neu in der Datenbank angelegt werden muss.
         await addDataToDatabase(gameId, fieldsWithoutID, sendGameToServer, containerID);
         generateGamesTableBody();
@@ -196,14 +200,14 @@ async function generateGamesTableBody() {
 
 function start() {
     fieldsWithoutID = fields.slice(1);
-    const addGameButton = createButton("addGameButton", "+", () => {
+    createAndShowBackButton("/admin", "gameButtons");
+    const addGameButton = createButton("addGameButton", addSvg, "image", "roundButton", () => {
         addDataToDatabaseButton(fieldsWithoutID, containerID, "addGameToDatabaseButton", "Spiel hinzufügen", generateGamesTableBody, "Spiel", sendGameToServer);
         createPreferredAndExcludedPlayerCountList();
     });
-    document.getElementById("gameList").insertBefore(addGameButton, document.getElementById("gamesTable"));
+    document.getElementById("gameButtons").appendChild(addGameButton);
     generateTableHead("gamesTableHead", fields);
     generateGamesTableBody();
-    createAndShowBackButton("/admin", "gameList", "gameBody");
 }
 
 start();

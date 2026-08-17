@@ -1,11 +1,28 @@
 <head>
-    
+    <script type="module" src="index.js" defer></script>
+    <link rel="stylesheet" href="/shared/global.css">
+    <link rel="stylesheet" href="/index.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
-    <h1>Herzlich willkommen auf der Startseite der Nerdsweek!</h1>
-    <p>Hier kannst du dich für die Nerdsweek anmelden und deine präferierten Spiele auswählen.</p>
-    <button id="joinButton" onclick="window.location.href='join/join.html'">Zur Anmeldung</button>
-    <br>
-    <button id="adminButton" onclick="window.location.href='/admin'">Admin-Bereich</button>
+    <main class="container">
+        <div id="navigationContainer" class="navigation"></div>
+        <button class="image-button" onclick="window.location.href='join/join.html'">
+            <img src="../assets/images/Nerdsweek-Header.webp" class="">
+            <p class="image-card__text">
+                <span>Jetzt anmelden</span>
+            </p>
+        </button>
+        <div class="card-container">
+            <button class="image-button">
+                <img src="../assets/images/Nerdsweek-Leute.webp" class="">
+                <span class="image-card__text image-card__small-text">Jetzt nachschauen</span>
+            </button>
+            <button class="image-button">
+                <img src="../assets/images/Nerdsweek-Spiele.webp" class="">
+                <span class="image-card__text image-card__small-text">Jetzt nachschauen</span>
+            </button>
+        </div>
+    </main>
 </body>

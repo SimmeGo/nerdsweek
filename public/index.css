@@ -1,0 +1,203 @@
+@import url("../shared/global.css");
+
+.navigation {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+}
+
+.navigation form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.navigation input {
+    min-width: 0;
+}
+
+.navigation-login {
+    margin-right: auto;
+    margin-bottom: 0rem;
+    border-radius: 0;
+}
+
+form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.navigation-login,
+.login-button {
+    font: inherit;
+    line-height: 2.5rem;
+    height: 2.5rem;
+    margin: 0;
+}
+
+form div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.user-button {
+    margin-left: auto;
+    border-radius: 0;
+    height: 2.5rem;
+}
+
+/* Design des Navigationsbereichs oben rechts.*/
+
+.user-dialog {
+    position: relative;
+    display: inline-block;
+}
+
+.user-dialog summary {
+    background-color: var(--bgCol);
+    height: 2.5rem;
+    width: 10rem;
+    color: var(--primCol);
+    display: flex;
+    vertical-align: middle;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.menu {
+    background: var(--bgCol);
+    position: absolute;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 10;
+
+    min-width: 10rem;
+}
+
+.menu a,
+.menu button {
+    display: block;
+    width: inherit;
+    padding: 0.5rem 0.75rem;
+
+    border: 3px solid transparent;
+    background: none;
+    color: var(--primCol);
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.menu button {
+    width: 100%;
+}
+
+.menu a:hover,
+.menu button:hover,
+.user-dialog summary:hover {
+    background: var(--primCol);
+    color: var(--bgCol);
+}
+
+.menu a:active,
+.menu button:active {
+    border: 3px solid rgba(52, 10, 87, 0.8);
+}
+
+.user-dialog summary:active::before {
+    border-top: 3px solid rgba(52, 10, 87, 0.8);
+    border-left: 3px solid rgba(52, 10, 87, 0.8);
+}
+
+.user-dialog summary:active::after {
+    border-bottom: 3px solid rgba(255,255,255, 0.8);
+    border-right: 3px solid rgba(255,255,255, 0.8);
+}
+
+/* Design für die großen Haupt-Buttons der Startseite.*/
+
+.card-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.image-button {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    width: 100%;
+    container-type: inline-size;
+    flex: 1 1 260px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+}
+
+.image-button img {
+    display: block;
+    width: 100%;
+    transition: transform 0.25s ease;
+}
+
+.image-button::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(226, 177, 181, 0.45);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.image-card__text {
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    color: var(--primCol);
+    font-family: Unitblock;
+    font-size: 10rem;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    width: 100%;
+    transform: translateX(0.6cqw);
+}
+
+.image-card__small-text {
+    font: 10cqw Unitblock;
+    line-height: 10cqw;
+}
+
+.image-button:hover::after,
+.image-button:hover .image-card__text,
+.image-button:hover .image-card__small-text {
+    opacity: 1;
+}
+
+@media (max-width: 700px) {
+    .image-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

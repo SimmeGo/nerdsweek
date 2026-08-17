@@ -1,11 +1,14 @@
 <head>
     <script type="module" src="/ranking/ranking.js" defer></script>
+    <link rel="stylesheet" href="/shared/global.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body id ="rankingBody">
     <h1> Rankingübersicht </h1>
     <p>Hier findest du alle Spiele, die bisher von Teilnehmern ausgewählt wurden.</p>
-    <div id="rankingList">
+    <div id="rankingButtons"></div>
+    <div id="rankingList" class="borderedContainer table-scroll">
         <table id="rankingTable">
             <thead id = "rankingTableHead">
             </thead>

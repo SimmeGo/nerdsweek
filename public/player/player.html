@@ -1,11 +1,15 @@
 <head>
     <script type="module" src="/player/player.js" defer></script>
+    <link rel="stylesheet" href="/shared/global.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body id ="playerBody">
     <h1> Teilnehmerübersicht </h1>
     <p>Hier findest du alle Teilnehmer, die sich bisher zur Nerdsweek angemeldet haben. Du kannst sie außerdem bearbeiten oder löschen oder neue Teilnehmer anlegen.</p>
-    <div id="playersList">
+    <div id="playerButtons"></div>
+    <div id="formContainer"></div>
+    <div id="playersList" class="borderedContainer table-scroll">
         <table id="playersTable">
             <thead id = "playersTableHead">
             </thead>
@@ -13,5 +17,4 @@
             </tbody>
         </table>
     </div>
-    <div id="formContainer"></div>
 </body>

@@ -1,10 +1,12 @@
 # Nerdsweek-Webapp
 Diese Webapp dient dazu, das mehrtägige Brettspielevent Nerdsweek besser organiseren und planen zu können. Dabei wird es in Zukunft viele Aufgaben wie Anmeldung, Brettspielverwaltung und Erstellung von Plänen übernehmen.
 
+![Startseite der Nerdsweek](/images/Startseite Nerdsweek.png)
+
 ## Funktionen
 
 ### Einmalige Anmeldung von Teilnehmern zur Nerdsweek
-Diejenigen, die an der nächsten Nerdsweek teilnehmen wollen, können sich über den Botton "Zur Anmeldung" anmelden. Es wird ein Formular angezeigt, in das sie ihren Namen und ihre Spielpräferenzen angeben können.
+Diejenigen, die an der nächsten Nerdsweek teilnehmen wollen, können sich über den Botton "Zur Anmeldung" anmelden. Es wird ein Formular angezeigt, in dem sie ihren Namen und ihre Spielpräferenzen angeben können.
 
 ### Verwaltung der Nerdsweek über den Adminbereich
 Der Adminbereich ist nur mit passenden Zugangsdaten zu erreichen. Derzeit besteht ein Admin-Nutzerkonto. Außerdem sind bereits folgende Funktionen implementiert:
@@ -13,9 +15,12 @@ Der Adminbereich ist nur mit passenden Zugangsdaten zu erreichen. Derzeit besteh
 - Einsicht in Spielerpräferenzen und daraus resultierendes Spieleranking
 - Erste Implementierung eines Planungsalgorithmus, der über viele Durchläufe den besten Plan mit den derzeit gegebenen Einstellungen findet und Unstimmigkeiten feststellt
 
+![Admin-Bereich](/images/Adminbereich Nerdsweek.png)
+
 ## Tech-Stack
 - Frontend:
     - HTML
+    - CSS
     - Javascript
     - DOM-API
 - Backend:
@@ -60,13 +65,14 @@ Die benötigten mySQL-Tabellen müssen derzeit händisch erstellt werden. Eine k
 ## Ausblick
 
 ### Geplante nächste Schritte
-- Umgestaltung der Startseite und der Anmeldeseite, um optisch ansprechender zu sein.
-- Verbesserung der Lesbarkeit der Tabellen im Adminbereich mittels CSS
 - Ausbau und Verbesserung des Planungsalgorithmus
 - Ausbau des Anmeldebereichs für Teilnehmer um weitere Formularfelder wie E-Mail-Adresse, Zimmerwünsche usw.
+- weitere Gestaltung der Seite mit CSS
 - Personalisierte Links, die es einem Teilnehmer ermöglichen, seine Anmeldung zu bearbeiten
 
 ### Mittelfristige Ziele
+- Suchfunktion für die einzelnen Tabellen etablieren
+- Umgestaltung der Anmeldeseite (Spiele sollen mittels Kacheln anwählbar werden)
 - Verbesserung der Fehlerhandhabung
 - Implementierung von Rollen- und Rechtemanagement
 - Verbesserung der Datensicherheit

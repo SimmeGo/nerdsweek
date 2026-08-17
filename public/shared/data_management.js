@@ -10,13 +10,21 @@ export function getValues(dataType) {
 }
 
 export async function refreshValues(dataType) {
-    dataStore[dataType]  = await loadValues(dataType);
+    dataStore[dataType] = await loadValues(dataType);
 }
 
 async function loadValues(dataType) {
-    const response = await fetch(`/${dataType}`);
+    const response = await fetch(`/${dataType}`, {cache: "no-store"});
     console.log(response.json);
     return await response.json();
+    /*const response = await fetch(`/${dataType}`);
+
+    console.log("Status:", response.status);
+
+    const text = await response.text();
+    console.log(text);
+
+    return JSON.parse(text);*/
 }
 
 export function translateValues(values) {
@@ -77,14 +85,14 @@ export function editDataInDatabase(containerID, dataId, fields, data, multipleFu
         input.value = element.get(dataEntry);
         };
     });
-    const saveChangesButton = createButton("saveChangesButton", "Speichern", async () => {
+    const saveChangesButton = createButton("saveChangesButton", "Speichern", "text", "", async () => {
         const values = checkDataBeforeServer(fields, containerID);
         console.log(values);
         const result = await sendFunction(values, dataId, false);
         formContainer.innerHTML = result.message;
         tableFunction();
     });
-    const cancelButton = createButton("cancelButton", "Abbrechen", () => {
+    const cancelButton = createButton("cancelButton", "Abbrechen", "text", "", () => {
         formContainer.innerHTML = "";
     });
     formContainer.appendChild(cancelButton);

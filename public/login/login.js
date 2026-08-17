@@ -16,6 +16,7 @@ async function sendLoginData() {
 
     if (result.success) {
         window.location.href = result.redirect;
+        console.log("Ich war hier!");
     }
 }
 

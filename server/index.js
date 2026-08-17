@@ -78,8 +78,16 @@ class Player {
     }
 }
 
+function adminData(req) {
+    return req.session.admin;
+}
+
+function isAdmin(req) {
+    return !!adminData(req);
+}
+
 function requireAdmin(req, res, next) {
-    if (!req.session.admin) {
+    if (!isAdmin) {
         return res.redirect("/login/login.html");
     }
     next();
@@ -196,7 +204,6 @@ app.get("/games", async (req, res) => {
         game.playerCount.excluded = excluded_player_count.map(row => row.player_count);
     };
     res.json(gameList);
-    
 });
 
 app.get("/players", async (req, res) => {
@@ -227,6 +234,21 @@ app.get("/players", async (req, res) => {
     
 });
 
+app.get("/checkLogin", async (req, res) => {
+    if (isAdmin(req)) {
+        const admin = adminData(req);
+        res.json({
+            id: admin.id,
+            username: admin.username,
+            loggedIn: admin.loggedIn
+        });
+    } else {
+        res.json({
+            loggedIn: isAdmin(req)
+        });
+    };
+});
+
 app.post("/login", async (req, res) => {
 
     const { username, password } = req.body;
@@ -248,8 +270,10 @@ app.post("/login", async (req, res) => {
     }
     req.session.admin = {
         id: admin.id,
-        username: admin.username
+        username: admin.username,
+        loggedIn : true
     };
+
     const returnTo = req.session.returnTo || "/admin";
     delete req.session.returnTo;
     
@@ -259,6 +283,25 @@ app.post("/login", async (req, res) => {
     });
 
 
+});
+
+app.post("/logout", (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({
+                message: "Logout fehlgeschlagen.",
+                success: false
+            });
+        };
+        console.log("Destroy-Funktion!");
+
+        res.clearCookie("connect.sid");
+        console.log("Kekse gereinigt.");
+        res.json({
+            message: "Logout erfolgreich!",
+            success: true
+        });
+    });
 });
 
 app.get("/admin", (req, res) => {
@@ -355,10 +398,8 @@ app.get("/admin/nerdsweekplanung", (req,res) => {
     res.sendFile(path.join(__dirname, "../public/createPlan/createPlan.html"));
 });
 
-app.listen(PORT, () => {
-
-    console.log(`Server läuft auf Port ${PORT}`);
-
+app.listen(PORT, "0.0.0.0", () => {
+  console.log("Server läuft auf Port 3000");
 });
 
 //const bcrypt = require("bcrypt");
