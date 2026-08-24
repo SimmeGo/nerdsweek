@@ -1,7 +1,7 @@
 # Nerdsweek-Webapp
 Diese Webapp dient dazu, das mehrtägige Brettspielevent Nerdsweek besser organiseren und planen zu können. Dabei wird es in Zukunft viele Aufgaben wie Anmeldung, Brettspielverwaltung und Erstellung von Plänen übernehmen.
 
-![Startseite der Nerdsweek](/images/Startseite Nerdsweek.png)
+![Startseite der Nerdsweek](/images/Startseite_Nerdsweek.png)
 
 ## Funktionen
 
@@ -15,7 +15,7 @@ Der Adminbereich ist nur mit passenden Zugangsdaten zu erreichen. Derzeit besteh
 - Einsicht in Spielerpräferenzen und daraus resultierendes Spieleranking
 - Erste Implementierung eines Planungsalgorithmus, der über viele Durchläufe den besten Plan mit den derzeit gegebenen Einstellungen findet und Unstimmigkeiten feststellt
 
-![Admin-Bereich](/images/Adminbereich Nerdsweek.png)
+![Admin-Bereich](/images/Adminbereich_Nerdsweek.png)
 
 ## Tech-Stack
 - Frontend:
