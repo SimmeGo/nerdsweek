@@ -53,7 +53,7 @@ export function translateValues(values) {
     return translatedValues;
 }
 
-export async function addDataToDatabase(dataId, fields, sendFunction, containerID) {
+export async function addDataToDatabase(dataId, fields, sendFunction, containerID, join) {
     const formContainer = document.getElementById(containerID);
     const values = checkDataBeforeServer(fields, containerID);
     console.log(values);
@@ -62,7 +62,11 @@ export async function addDataToDatabase(dataId, fields, sendFunction, containerI
     }
     const result = await sendFunction(values, dataId, false);
     console.log(result);
-    formContainer.innerHTML = result.message;
+    if (join) {
+        formContainer.innerHTML = `Herzlich Willkommen, ${result.title}. Du hast dich erfolgreich zur Nerdsweek angemeldet!`;
+    } else {
+        formContainer.innerHTML = result.message;
+    };
     return result.success;
 }
 
@@ -110,6 +114,30 @@ export async function deleteDataFromDatabase(data, dataId, tableFunction, sendFu
         }
         tableFunction();
     }
+}
+
+export async function sendPlayerToServer(player_data, playerId, del) {
+    const response = await fetch("/players", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            firstName: player_data[0],
+            lastName: player_data[1],
+            rank1: player_data[2],
+            rank2: player_data[3],
+            rank3: player_data[4],
+            rank4: player_data[5],
+            rank5: player_data[6],
+            rank6: player_data[7],
+            rank7: player_data[8],
+            rank8: player_data[9],
+            playerId: playerId,
+            del: del
+        })
+    });
+    return await response.json();
 }
 
 export function getValuesfromForm(fields) {

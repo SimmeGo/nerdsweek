@@ -167,7 +167,7 @@ async function writeData(data, dataColumns, tableName, dataId) {
         newEntryResult.type = "bearbeitet";
     }
     const message = `${tableGender} ${table} ${Object.values(dataEntry)[1]} wurde erfolgreich ${newEntryResult.type}!`;
-    return { message: message, success: newEntryResult.success, newDataId: newDataId };
+    return { message: message, success: newEntryResult.success, title: Object.values(dataEntry)[1], newDataId: newDataId };
 }
 
 app.use("/admin", requireAdmin);

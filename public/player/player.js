@@ -1,11 +1,22 @@
-import { generateForm } from "/shared/forms.js";
-import { createButton } from "/shared/forms.js";
-import { generateTableHead } from "/shared/forms.js";
-import { generateTableBody} from "/shared/forms.js";
-import { createFieldsForPlayer } from "/shared/forms.js";
-import { addDataToDatabaseButton, createAndShowBackButton } from "../shared/forms.js";
-import { getValues } from "/shared/data_management.js";
-import { deleteDataFromDatabase, editDataInDatabase, refreshValues } from "../shared/data_management.js";
+import {
+    generateForm,
+    createButton,
+    generateTableBody,
+    generateTableHead,
+    createFieldsForPlayer,
+    addDataToDatabaseButton,
+    createAndShowBackButton,
+    createGamesOptions
+}
+from "../shared/forms.js";
+
+import {
+    getValues,
+    deleteDataFromDatabase,
+    editDataInDatabase,
+    refreshValues
+}
+from "../shared/data_management.js";
 
 
 let players = [];
@@ -28,53 +39,9 @@ function generatePlayersTableBody() {
     generateTableBody("playersTableBody", "players", playersTableButtons, fields, true);
 }
 
-function createGamesOptions() {
-    const rankFields = fields.filter(field => field.element === "select");
-    rankFields.forEach( field => {
-        const select = document.getElementById(field.name);
-        select.innerHTML = "";
-        let option = document.createElement("option");
-        option.value = "-1";
-        option.textContent = "--- Bitte auswählen ---"
-        select.appendChild(option);
-        games.forEach( game => {
-            option = document.createElement("option");
-            option.value = game.id;
-            if (game.id) { // Fehler muss angezeigt werden!
-                option.textContent = game.title;
-            }
-            select.appendChild(option);
-        });
-        option = document.createElement("option");
-        option.value = "0";
-        option.textContent = "keine Präferenz";
-        select.appendChild(option);
-    });
-}
 
-async function sendPlayerToServer(player_data, playerId, del) {
-    const response = await fetch("/players", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            firstName: player_data[0],
-            lastName: player_data[1],
-            rank1: player_data[2],
-            rank2: player_data[3],
-            rank3: player_data[4],
-            rank4: player_data[5],
-            rank5: player_data[6],
-            rank6: player_data[7],
-            rank7: player_data[8],
-            rank8: player_data[9],
-            playerId: playerId,
-            del: del
-        })
-    });
-    return await response.json();
-}
+
+
 
 async function start() {
     fields = createFieldsForPlayer();
@@ -88,7 +55,7 @@ async function start() {
     const backButton = createAndShowBackButton("/admin", "playerButtons");
     const addPlayerButton = createButton("addPlayerButton", addSvg, "image", "roundButton", () => {
         addDataToDatabaseButton(fieldsWithoutID, containerID, "addPlayerToDatabaseButton", "Spieler hinzufügen", generatePlayersTableBody, "Spieler", sendPlayerToServer);
-        createGamesOptions();
+        createGamesOptions(fields);
     });
     document.getElementById("playersTable");
     document.getElementById("playerButtons").appendChild(addPlayerButton);

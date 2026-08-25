@@ -214,14 +214,12 @@ function assignPlaysToTimeslot() {
                     } else {
                         thisTimeslot = [Number(randomPlayerCounts[0])];
                     };
-                    //console.log(`Der Timeslot ${thisTimeslot} wurde für das Play mit der ID ${rankPlay.id} vergeben.`);
                     rankPlay.timeslot = thisTimeslot;
                 };
             };
         });
     };
     plays.forEach(play => {
-        //console.log(`Die Partie mit der ID ${play.id} findet im Zeitslot ${play.timeslot} statt.`);
     });
     for (let i = 1; i <= 8; i++) {
         const playsInTimeslot = plays.filter(play => play.timeslot?.includes(i));

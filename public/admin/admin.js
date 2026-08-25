@@ -1,4 +1,5 @@
 import { createButton } from "../shared/forms.js";
+import { logoutUser } from "../shared/user_management.js";
 
 const adminBody = document.getElementById("adminBody");
 const logoutSvg = "m6.5 8-4 4 4 4m-4-4h13M14 6V5a2 2 0 0 1 2-2h3.5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2v-1";

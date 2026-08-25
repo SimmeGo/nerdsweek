@@ -99,6 +99,32 @@ export function createFieldsForPlayer() {
     return fields;
 }
 
+export async function createGamesOptions(fields) {
+    const rankFields = fields.filter(field => field.element === "select");
+    await refreshValues("games");
+    const games = await getValues("games").sort((a, b) => a.title.localeCompare(b.title));
+    rankFields.forEach( field => {
+        const select = document.getElementById(field.name);
+        select.innerHTML = "";
+        let option = document.createElement("option");
+        option.value = "-1";
+        option.textContent = "--- Bitte auswählen ---"
+        select.appendChild(option);
+        games.forEach( game => {
+            option = document.createElement("option");
+            option.value = game.id;
+            if (game.id) { // Fehler muss angezeigt werden!
+                option.textContent = game.title;
+            }
+            select.appendChild(option);
+        });
+        option = document.createElement("option");
+        option.value = "0";
+        option.textContent = "keine Präferenz";
+        select.appendChild(option);
+    });
+}
+
 export function generateTableHead(tableHeadID, fields, values, tableFunction) {
     const tableHead = document.getElementById(tableHeadID);
     const headTr = document.createElement("tr");
@@ -156,14 +182,19 @@ export async function generateTableBody(tableBodyID, dataType, buttons, fields, 
     return translatedValues;
 }
 
-export function addDataToDatabaseButton(fields, containerID, buttonID, buttonLabel, tableFunction, dataType, sendFunction) {
+export function addDataToDatabaseButton(fields, containerID, buttonID, buttonLabel, tableFunction, dataType, sendFunction, join) {
     //const fieldsWithoutID = fields.slice(1);
     generateForm(fields, containerID);
     const formContainer = document.getElementById(containerID);
+    const firstName = document.getElementById("name").textContent;
+    let clickMessage;
     const addDataToDatabaseButton = createButton(buttonID, buttonLabel, "text", "", async () => {
         const dataId = 0; // dataId wird später an den Server übergeben. Ist sie 0, sagt dies dem Server, dass der Datensatz neu in der Datenbank angelegt werden muss.
-        await addDataToDatabase(dataId, fields, sendFunction, containerID);
-        tableFunction();
+        await addDataToDatabase(dataId, fields, sendFunction, containerID, join);
+
+        if (tableFunction !== "") {
+            tableFunction();
+        };
     });
     document.getElementById(containerID).appendChild(addDataToDatabaseButton);
 }
