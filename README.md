@@ -6,7 +6,7 @@ Diese Webapp dient dazu, das mehrtägige Brettspielevent Nerdsweek besser organi
 ## Funktionen
 
 ### Einmalige Anmeldung von Teilnehmern zur Nerdsweek
-Diejenigen, die an der nächsten Nerdsweek teilnehmen wollen, können sich über den Botton "Zur Anmeldung" anmelden. Es wird ein Formular angezeigt, in dem sie ihren Namen und ihre Spielpräferenzen angeben können.
+Diejenigen, die an der nächsten Nerdsweek teilnehmen wollen, können sich über einen Klick auf den großen Nerdsweek-Banner-Button anmelden. Es wird ein Formular angezeigt, in dem sie ihren Namen und ihre Spielpräferenzen angeben können.
 
 ### Verwaltung der Nerdsweek über den Adminbereich
 Der Adminbereich ist nur mit passenden Zugangsdaten zu erreichen. Derzeit besteht ein Admin-Nutzerkonto. Außerdem sind bereits folgende Funktionen implementiert:

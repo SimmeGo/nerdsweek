@@ -1,7 +1,6 @@
 import { addDataToDatabase, getValues, refreshValues, translateValues } from "/shared/data_management.js";
 
 export function createButton(id, label, contentType, cssClass, onClick) {
-    console.log(label);
     const button = document.createElement("button");
     button.id = id;
     //button.textContent = label;
@@ -211,16 +210,26 @@ export function calculateRatings(games, players) {
             ));
             for (const [key, value] of Object.entries(ranks)) {
                 if (value === game.id) {
-                    const pointsOfPlayer = Math.round( (9 - Number(key.replace("rank", ""))) ** (1 / 1.5) * 100);
+                    const rankNumber = Number(key.replace("rank", ""));
+                    const pointsOfPlayer = calculateRankingScoreForPlayer(rankNumber);
                     points = points + pointsOfPlayer;
-                    playersChoseThisGame.push(player.id);
+                    playersChoseThisGame.push({
+                        playerId: player.id,
+                        rank: rankNumber
+                    });
                 }
             };   
         });
         gamesRating[game.id] = points;
-        playersChoseGame[game.id] = playersChoseThisGame;
+        if (playersChoseThisGame.length > 0) {
+            playersChoseGame[game.id] = playersChoseThisGame;
+        }
     });
     return [gamesRating, playersChoseGame];
+}
+
+export function calculateRankingScoreForPlayer(rankNumber) {
+    return Math.round( (9 - rankNumber) ** (1 / 1.5) * 100);
 }
 
 export function shuffle(array) {

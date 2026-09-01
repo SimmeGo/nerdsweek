@@ -14,7 +14,8 @@ import {
     getValues,
     deleteDataFromDatabase,
     editDataInDatabase,
-    refreshValues
+    refreshValues,
+    sendPlayerToServer
 }
 from "../shared/data_management.js";
 

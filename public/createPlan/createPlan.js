@@ -1,5 +1,5 @@
 import { getValuesfromForm } from "../shared/data_management.js";
-import { calculateRatings, createButton, generateForm, createAndShowBackButton, shuffle } from "../shared/forms.js";
+import { calculateRatings, createButton, generateForm, createAndShowBackButton, shuffle, calculateRankingScoreForPlayer } from "../shared/forms.js";
 import { getValues, refreshValues } from "/shared/data_management.js";
 //Parameter für die Planung:
 // ### oberste Priorität ###
@@ -18,11 +18,13 @@ let games = [];
 let players = [];
 let ratings = [];
 let gamesRating = {};
-let playersChoseGame = {};
+let chosenGames = {};
 let playCountOfGame = {};
 let infractions = {};
 let newExcessPenalty;
 
+const TIMESLOTS = [1, 2, 3, 4, 5, 6, 7, 8];
+const RANKS = TIMESLOTS;
 const containerId = "formContainer";
 const fields = [
     {
@@ -49,17 +51,16 @@ class Timeslot {
 
 class Play {
 
-    constructor(id, playedGame, timeSlot, timeslotCount, players, duration, winner) {
+    constructor(id, playedGame, timeslot, timeslotCount, players, duration, winner) {
 
         this.id = id;
         this.playedGame = playedGame;
-        this.timeslot = timeSlot;
+        this.timeslot = timeslot;
         this.timeslotCount = timeslotCount;
         this.players = players;
         this.duration = duration;
         this.winner = winner;
-        this.complete = false;
-        this.consecutive = false;
+        this.validPlayerCount = false;
     }
 
     calculateScore() { }
@@ -85,173 +86,316 @@ class Play {
 
 let timeslots = []
 
-function generatePlays() {
-    games.forEach(game => {
-        const playerCount = Object.entries(playersChoseGame).find(
-            ([key, value]) => Number(key) === game.id
-        )?.[1].length;
-        let playCount = 1;
-        if (playersChoseGame[game.id].length > game.playerCount.max) {
-            playCount = Math.ceil(playersChoseGame[game.id].length / game.playerCount.max);
-//            console.log(playCount);
-        }
-        //console.log(structuredClone(playerCount));
-        for (let i = 1; i <= playCount; i++) {
-            if (playerCount !== 0) {
-                const play = new Play(nextPlayId, game.id, null, null, null, null, null);
-                if (playerCount !== game.playerCount.excluded && playerCount >= game.playerCount.min) {
-                    play.complete = true;
-                }
-                plays.push(play);
-                nextPlayId++;
-            }
+function findPlayerGroupsForPlays(game, playersAndRanks) {
+    let prefferedPlayerCount = game.playerCount.preferred;
+    if (game.playerCount.preferred.length === 0) {
+        for (let i = game.playerCount.min; i <= game.playerCount.max; i++) {
+            prefferedPlayerCount.push(i);
         };
-    });
+    };
+    prefferedPlayerCount = prefferedPlayerCount.filter(playerCount => !game.playerCount.excluded.includes(playerCount));
 
-    //console.log(`Es wurden erfolgreich ${plays.length} Partien für die Nerdsweek angelegt.`);
+    if (game.playerCount.preferred.includes(chosenGames[game.id].length)) {
+        return [chosenGames[game.id]];
+    }
+
+    const sortedPlayers = sortPlayersByRank(playersAndRanks);
+    const groupVariants = [];
+    for (let i = 0; i <= 99; i++) {
+        groupVariants.push(createPlayerGroupsForChosenGame(prefferedPlayerCount, game, sortedPlayers));
+    }
+    let bestGroupVariant = null;
+    for (const groupVariant of groupVariants) {
+        const currentGroupVariant = {
+            playerGroup: groupVariant,
+            penaltyScore: assessGroupVariants(groupVariant, prefferedPlayerCount)
+        }
+        if (bestGroupVariant === null) {
+            bestGroupVariant = currentGroupVariant;
+        } else if (bestGroupVariant.penaltyScore > currentGroupVariant.penaltyScore) {
+            bestGroupVariant = currentGroupVariant;
+        }
+    }
+    //console.log(game.title, `Anzahl der Gruppen: ${bestGroupVariant.playerGroup.length}`, `Strafpunkte: ${bestGroupVariant.penaltyScore}`);
+
+    return bestGroupVariant.playerGroup;
 }
 
-function assignPlayersToPlays() {
-    //const playerCountofPlay = createPlayerCountforPlays();
-    let availablePlayers = [];
-    let remainingPlayerCount = 0;
-    let i = 0;
-    while (i < plays.length) {
-        const play = plays[i];
-        const thisGame = games.find(game => game.id === play.playedGame);
-        const playCount = plays.filter(play => play.playedGame === thisGame.id).length;
-        let playerCount = 0;
-        if (remainingPlayerCount === 0) {
-            remainingPlayerCount = playersChoseGame[play.playedGame].length;
-            availablePlayers = structuredClone(playersChoseGame[play.playedGame]);
-        };
-        if (playCount > 1 && remainingPlayerCount > thisGame.playerCount.max) {
-            playerCount = Math.floor(playersChoseGame[thisGame.id].length / playCount);
-        } else {
-            playerCount = remainingPlayerCount;
-        };
-        remainingPlayerCount = remainingPlayerCount - playerCount;
-        //console.log(`${remainingPlayerCount} Spieler sind nach der Verteilung auf das erste Play noch verfügbar.`)
-        if (thisGame.duration.min >= 480) {
-            play.timeslotCount = 2;
-        } else {
-            play.timeslotCount = 1;
-        };
-        play.players = availablePlayers
-            .sort(() => Math.random() - 0.5)
-            .splice(0, playerCount);
-        let playerNames = [];
-        play.players.forEach(playerInGame => {
-            const player = players.find(player => player.id === playerInGame);
-            const playerName = `${player.firstName} ${player.lastName}`;
-            playerNames.push(playerName);
-        });
-        if (thisGame.playerCount.excluded.includes(play.players.length) || thisGame.playerCount.min > play.players.length) {
-            infractions.invalidPlayerCount.push({
-                object: "play",
-                objectId: play.id
-            });
-        };
-        i++;
-        //console.log(`Die Spieler ${playerNames?.join(", ")} spielen gemeinsam das Spiel ${thisGame.title}`);
+function createPlayerGroupsForChosenGame(prefferedPlayerCount, game, playersOfGame) {
+    const playerGroups = [];
+    const playerGroupCounts = [];
+    let remainingPlayerCount = playersOfGame.length;
+    while ( prefferedPlayerCount.includes(remainingPlayerCount) || prefferedPlayerCount.some(count => remainingPlayerCount > count) ) {
+        const playerCount = shuffle(prefferedPlayerCount)[0];
+        const possibleRemaining = remainingPlayerCount - playerCount;
+        if ( possibleRemaining < 0 ) continue;
+        playerGroupCounts.push(playerCount);
+        remainingPlayerCount = possibleRemaining;
+    };
+    if (remainingPlayerCount > 0 ) {
+        playerGroupCounts.push(remainingPlayerCount);
+    };
+    let playersCopy = structuredClone(playersOfGame);
+    playerGroupCounts.forEach(count => {
+        playerGroups.push(playersCopy.splice(0, count));
+    });
+
+    return playerGroups;
+}
+
+function assessGroupVariants(groupVariant, prefferedPlayerCount) {
+    let penaltyScore = 0;
+    for (const group of groupVariant) {
+        if (!prefferedPlayerCount.includes(group.length)) {
+            for (const player of group) {
+                penaltyScore = penaltyScore + calculateRankingScoreForPlayer(player.rank);
+            }
+        }
+    }
+    return penaltyScore;
+}
+
+function sortPlayersByRank(playersAndRanks) {
+    const sortedPlayers = structuredClone(playersAndRanks);
+    return playersAndRanks.sort((a, b) => a.rank - b.rank);
+}
+
+function generatePlays() {
+    for (const gameId in chosenGames) {
+        const game = games.find(game => game.id === Number(gameId));
+        const playGroups = findPlayerGroupsForPlays(game, chosenGames[gameId]);
+        for (const group of playGroups) {
+            const play = new Play(nextPlayId, game.id, null, null, group.map(player => player.playerId), null, null);
+            if (game.duration.min >= 480) {
+                play.timeslotCount = 2;
+            } else {
+                play.timeslotCount = 1;
+            };
+            if (play.players.length < game.playerCount.min || game.playerCount.excluded.includes(play.players.length)) {
+                play.validPlayerCount = false;
+            } else {
+                play.validPlayerCount = true;
+            }
+            plays.push(play);
+        }
     };
 }
 
 function createTimeslots() {
     const dates = ["19.05.", "20.05.", "20.05.", "21.05.", "21.05.", "22.05.", "22.05.", "23.05."]
-    for (let i = 1; i <= 8; i++) {
+    for (const timeslot of TIMESLOTS) {
         let startTime;
-        if (i % 2 === 0) {
+        if (timeslot % 2 === 0) {
             startTime = "10 Uhr";
         } else {
             startTime = "17 Uhr";
         };
-        const timeslot = new Timeslot(i, dates[i - 1], startTime, null);
-        timeslots.push(timeslot);
+        const timeslotEntry = new Timeslot(timeslot, dates[timeslot - 1], startTime, null);
+        timeslots.push(timeslotEntry);
     }
 }
 
 function assignPlaysToTimeslot() {
-    let finalCount = null;
-    //console.log(`Der Timeslot von Play 1 ist ${plays[0].timeslot}.`);
-    for (let i = 1; i <= 8; i++) {
-        const randomPlayers = players
-            .sort(() => Math.random() - 0.5);
-        randomPlayers.forEach(player => {
-            let playerCount = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0};
+    assignUnscheduledPlays();
+    findDoublePlayerInfractions(plays);
+}
 
-            if (player[`rank${i}`] !== 0) {
-                const thisGame = games.find(game => game.id === player[`rank${i}`]);
-                const rankPlay = plays.find(play =>
-                    play.playedGame === player[`rank${i}`] &&
-                    play.players.includes(player.id)
-                );
-                for (const play of plays) {
-                    if (Array.isArray(play.timeslot)) {
-                        play.timeslot.forEach(entry => {
-                            if (entry in playerCount) {
-                                playerCount[entry] = playerCount[entry] + play.players.length;
-                            };
-                        });
-                    }
-                };
-                if (rankPlay.timeslot === null) {
-                    const playerCountEntries = Object.entries(playerCount);
-                    let smallestCount = Math.min(...playerCountEntries.map(([, count]) => Number(count)));
-                    let thisTimeslot;
-                    const smallestPlayerCounts = playerCountEntries
-                        .filter(([, entry]) => entry === smallestCount)
-                        .map(([timeslot]) => Number(timeslot));
-                    const randomPlayerCounts = shuffle(smallestPlayerCounts);
-                    if (rankPlay.timeslotCount === 2) {
-                        if (randomPlayerCounts[0] === 8 && randomPlayerCounts.length === 1) {
-                            thisTimeslot = [Number(7), Number(8)];
-                        } else if (randomPlayerCounts[0] !== 8) {
-                            thisTimeslot = [Number(randomPlayerCounts[0]), Number(randomPlayerCounts[0]) + 1];
-                        } else {
-                            thisTimeslot = [Number(randomPlayerCounts[1]), Number(randomPlayerCounts[1]) + 1];
-                        };
-                    } else {
-                        thisTimeslot = [Number(randomPlayerCounts[0])];
-                    };
-                    rankPlay.timeslot = thisTimeslot;
-                };
+function assignUnscheduledPlays() {
+    for (const rank of RANKS) {
+        for (const player of shuffle([...players])) {
+            const gameId = player[`rank${rank}`];
+
+            if (gameId === 0) continue;
+
+            const play = findPlayForPlayerAndGame(player.id, gameId);
+
+            if (!play || play.timeslot !== null || play.validPlayerCount === false) continue;
+
+            play.timeslot = chooseTimeslot(play.timeslotCount, play.players);
+        }
+    }
+    for (const play of plays.filter(play => play.timeslot === null)) {
+        play.timeslot = chooseTimeslot(play.timeslotCount, play.players);
+    }
+}
+
+function findPlayForPlayerAndGame(playerId, gameId) {
+    return plays.find(play =>
+        play.playedGame === gameId &&
+        play.players.includes(playerId)
+    );
+}
+
+function chooseTimeslot(timeslotCount, players) {
+    const playCountsPerTimeslotAndPlayer = countPlaysPerTimeslotAndPlayer();
+    const freeTimeslotsForPlayers = findFreeTimeslotsForPlayers(playCountsPerTimeslotAndPlayer, players);
+
+    if (freeTimeslotsForPlayers.length === 0) {
+        return ["not assignable"];
+    }
+
+    const leastOccupiedAndFreeTimeslots = findLeastOccuppiedTimeslots(freeTimeslotsForPlayers)
+    const shuffledSlots = shuffle(leastOccupiedAndFreeTimeslots);
+
+    //const playerCounts = countPlayersPerTimeslot();
+    //const leastOccupiedSlots = findLeastOccuppiedTimeslots(playerCounts);
+
+
+    if (timeslotCount === 1) {
+        return [shuffledSlots[0]];
+    }
+
+    return chooseTwoConsecutiveTimeslots(shuffledSlots);
+}
+
+function countPlayersPerTimeslot() {
+    const counts = Object.fromEntries(
+        TIMESLOTS.map(timeslot => [timeslot, 0])
+    );
+
+    for (const play of plays) {
+        if (!Array.isArray(play.timeslot)) continue;
+
+        for (const timeslot of play.timeslot) {
+            if (timeslot in counts) {
+                counts[timeslot] += play.players.length;
             };
-        });
+        };
     };
-    plays.forEach(play => {
-    });
-    for (let i = 1; i <= 8; i++) {
-        const playsInTimeslot = plays.filter(play => play.timeslot?.includes(i));
-        const playerInTimeslot = {};
-        players.forEach(player => {
-            playerInTimeslot[player.id] = 0;
-        });
-        for (const play of playsInTimeslot) {
-            for (const playerId of play.players) {
-                playerInTimeslot[playerId] = (playerInTimeslot[playerId] ?? 0) + 1;
+
+    return counts;
+}
+
+function findLeastOccuppiedTimeslots(freeTimeslots) {
+    const playerCounts = countPlayersPerTimeslot();
+    const freeTimeslotsPlayerCount = Object.fromEntries(Object.entries(playerCounts).filter(([timeslot]) => freeTimeslots.includes(Number(timeslot))));
+    const smallestCount = Math.min(...Object.values(freeTimeslotsPlayerCount));
+
+    return Object.entries(freeTimeslotsPlayerCount)
+        .filter(([, count]) => count === smallestCount)
+        .map(([timeslot]) => Number(timeslot));
+}
+
+function findFreeTimeslotsForPlayers(playerCounts, players) {
+    let timeslotIsFree;
+    const freeTimeslots = [];
+    for (const timeslot of TIMESLOTS) {
+        timeslotIsFree = true;
+        for (const [player, count] of Object.entries(playerCounts[timeslot])) {
+            if (players.includes(Number(player)) && Number(count) > 0) {
+                timeslotIsFree = false;
+                break;
             }
         }
-        for (const [playerId, count] of Object.entries(playerInTimeslot)) {
-            const excess = count - 1;
+        if (timeslotIsFree === false) continue;
+        freeTimeslots.push(Number(timeslot));
+    }
+    return freeTimeslots;
+}
 
-            if (excess > 0) {
-                infractions.doublePlayer.push({
-                    object: "timeslot",
-                    objectId: i,
-                    playerId: Number(playerId),
-                    excess: excess
-                });
+function chooseTwoConsecutiveTimeslots(candidateSlots) {
+    const firstSlot = candidateSlots[0];
+
+    //Ein Spiel mit einer Länge von zwei Slots darf nicht über Timeslot 8 hinausgehen.
+    if (firstSlot < 8) {
+        return [firstSlot, firstSlot + 1];
+    };
+
+    const earlierSlot = candidateSlots.find(slot => slot < 8);
+
+    return earlierSlot
+        ? [earlierSlot, earlierSlot + 1]
+        : [7, 8];
+}
+
+function findPlaysForTimeslot(timeslot) {
+    return plays.filter(play =>
+        play.timeslot?.includes(timeslot)
+    );
+}
+
+function findDoublePlayerInfractions(currentPlays) {
+    for (const timeslot of TIMESLOTS) {
+        const playsInTimeslot = currentPlays.filter(play =>
+            play.timeslot?.includes(timeslot)
+        );
+
+        const playerCounts = countPlaysPerPlayer(playsInTimeslot);
+
+        for (const [playerId, count] of Object.entries(playerCounts)) {
+            if (count <= 1) continue;
+
+            infractions.doublePlayer.push({
+                object: "timeslot",
+                objectId: timeslot,
+                playerId: Number(playerId),
+                playIds: getPlayIdsForPlayer(playsInTimeslot, Number(playerId)),
+                excess: count - 1
+            })
+        }
+    }
+}
+
+function countPlaysPerPlayer(playsInTimeslot) {
+    const counts = Object.fromEntries(
+        players.map(player => [player.id, 0])
+    );
+
+    for (const play of playsInTimeslot) {
+        for (const playerId of play.players) {
+            counts[playerId] = (counts[playerId] ?? 0) + 1;
+        };
+    };
+
+    return counts;
+}
+
+function countPlaysPerTimeslotAndPlayer() {
+    const counts = Object.fromEntries(
+        TIMESLOTS.map(timeslot => [timeslot])
+    );
+    for (const timeslot of TIMESLOTS) {
+        counts[timeslot] = Object.fromEntries(
+            players.map(player => [player.id, 0])
+        );
+        const playsInTimeslot = findPlaysForTimeslot(timeslot);
+        if (!Array.isArray(playsInTimeslot)) continue;
+        for (const play of playsInTimeslot) {
+            for (const player of play.players) {
+                counts[timeslot][player] = (counts[timeslot][player] ?? 0) + 1;
             }
         }
     }
+
+    return counts;
+}
+
+function getPlayIdsForPlayer(playsInTimeslot, playerId) {
+    return playsInTimeslot
+        .filter(play => play.players.includes(playerId))
+        .map(play => play.id);
+}
+
+function writeDoublePlayerInfractions() {
+
+}
+
+function countExcess() {
     const playerExcess = {};
+    const timeslotExcess = {};
+    const playExcess = {};
     players.forEach(player => {
         playerExcess[player.id] = 0;
     });
     for (const doublePlayer of infractions.doublePlayer) {
         playerExcess[doublePlayer.playerId] = (playerExcess[doublePlayer.playerId] ?? 0) + 1;
+        timeslotExcess[doublePlayer.objectId] = (timeslotExcess[doublePlayer.objectId] ?? 0) + 1;
+        doublePlayer.playIds.forEach(playId => {
+            const play = plays.find(play => play.id === playId);
+            playExcess[playId] = (playExcess[playId] ?? 0) + 1 / play.players.length * 60;
+        });
     };
+    
     const maxExcess = Math.max(
         0,
         ...infractions.doublePlayer.map(infraction => infraction.excess)
@@ -260,7 +404,11 @@ function assignPlaysToTimeslot() {
     infractions.doublePlayer.forEach(infraction => {
         totalExcess = totalExcess + infraction.excess;
     });
-    return [totalExcess, maxExcess, playerExcess];
+    return [totalExcess, maxExcess, playerExcess, timeslotExcess, playExcess];
+}
+
+function countNotAssignablePlays() {
+    return plays.filter(play => play.timeslot.includes("not assignable")).length;
 }
 
 function calculateSatisfactionScore() {
@@ -276,7 +424,7 @@ function resetValues() {
     plays = [];
     ratings = calculateRatings(games, players);
     gamesRating = ratings[0];
-    playersChoseGame = ratings[1];
+    chosenGames = ratings[1];
     nextPlayId = 1;
 }
 
@@ -292,9 +440,8 @@ function calculateExcessPenalty(playerExcess) {
     return excessPenalty;
 }
 
-function findBestPlan(oldPlan, newPlan) {
-    let newBetter = false;
-    let oldExcessPenalty;
+function comparePlans(oldPlan, newPlan) {
+    /*let oldExcessPenalty;
     if (oldPlan.maxExcess > newPlan.maxExcess) {
         newBetter = true;
     };
@@ -310,32 +457,30 @@ function findBestPlan(oldPlan, newPlan) {
             };
 
         }
-    };
-    return newBetter;
+    };*/
+    if (oldPlan.notAssignablePlays > newPlan.notAssignablePlays) {
+        return true;
+    }
+    return false;
 }
 
-function optimizePlan(cycleCount) {
+function generateAndCyclePlans(cycleCount) {
     let bestPlan = null;
     let cycleNumber = 0;
     for (let i = 0; i < cycleCount; i++) {
-        const [totalExcess, maxExcess, playerExcess] = generatePlan();
+        generatePlan();
+        const [totalExcess, maxExcess, playerExcess, timeslotExcess, playExcess] = countExcess();
+        const notAssignablePlays = countNotAssignablePlays();
         const currentPlan = {
             plays: structuredClone(plays),
             totalExcess: totalExcess,
             maxExcess: maxExcess,
-            playerExcess: playerExcess
+            playerExcess: playerExcess,
+            timeslotExcess: timeslotExcess,
+            playExcess: playExcess,
+            notAssignablePlays: notAssignablePlays
         };
-        if (!bestPlan) {
-            bestPlan = currentPlan;
-        } else if (findBestPlan(bestPlan, currentPlan)) {
-            bestPlan = currentPlan;
-            console.log(
-                `Durchlauf ${i}:`,
-                bestPlan.maxExcess,
-                bestPlan.totalExcess,
-                newExcessPenalty
-            );
-        }
+        bestPlan = analysePlan(currentPlan, bestPlan, i);
         cycleNumber = i;
     }
     console.log(cycleNumber);
@@ -345,15 +490,32 @@ function optimizePlan(cycleCount) {
 function generatePlan() {
     resetValues();
     generatePlays();
-    assignPlayersToPlays();
+    //assignPlayersToPlays();
     return assignPlaysToTimeslot();
+}
+
+function analysePlan(currentPlan, bestPlan, i) {
+    if (!bestPlan) {
+        bestPlan = currentPlan;
+    } else if (comparePlans(bestPlan, currentPlan)) {
+        bestPlan = currentPlan;
+        console.log(
+            `Durchlauf ${i}:`,
+            bestPlan.maxExcess,
+            bestPlan.totalExcess,
+            newExcessPenalty,
+            `übrige Plays: ${bestPlan.notAssignablePlays}`
+        );
+    }
+    return bestPlan
 }
 
 function startAlgorithm() {
     document.getElementById("resultContainer").innerHTML = "";
     const cycleCount = getValuesfromForm(fields);
-    const bestPlan = optimizePlan(cycleCount);
+    const bestPlan = generateAndCyclePlans(cycleCount);
     displayResults(bestPlan);
+    //optimizePlan(bestPlan);
 }
 
 function displayResults(bestPlan) {
@@ -386,7 +548,63 @@ function displayResults(bestPlan) {
         element.textContent = textElement;
         resultContainer.appendChild(element);
     })
-} 
+}
+
+function findKey(object, operation) {
+    const thisValue = operation(
+        0,
+        ...Object.values(object)
+    );
+    const key = Object.entries(object).find(
+        ([key, value]) => value === thisValue
+    )?.[0];
+    return key;
+}
+
+/*function countPlayersPerTimeslot() {
+    const playerCountPerTimeslot = {};
+    for (let i = 1; i <= 8; i++) {
+        const playsInTimeslot = plays.filter(play => play.timeslot === i);
+        playsInTimeslot.forEach(play => {
+            playerCountPerTimeslot[i] = (playerCountPerTimeslot[i] ?? 0) + play.players.length;
+        });
+    }
+    return playerCountPerTimeslot;
+}*/
+
+function optimizePlan(currentBestPlan) {
+    let i = 0;
+    let bestPlan = currentBestPlan;
+    while (currentBestPlan.totalExcess !== 0) {
+        i++;
+        const changedPlan = structuredClone(bestPlan);
+        const maxExcessTimeslot = Number(findKey(changedPlan.timeslotExcess, Math.max));
+        const thisTimeslotInfractions = infractions.doublePlayer.filter(infraction =>
+            Number(infraction.objectId) === maxExcessTimeslot
+        );
+        const playsInTimeslot = changedPlan.plays.filter(play => play.timeslot?.includes(maxExcessTimeslot));
+        const playIds = [];
+        playsInTimeslot.forEach(play => {
+            playIds.push(play.id);
+        });
+        const playExcessInTimeslot = Object.fromEntries(
+            Object.entries(changedPlan.playExcess).filter(([playId]) => playIds.includes(Number(playId)))
+        );
+        const maxExcessPlayId = Number(findKey(playExcessInTimeslot, Math.max));
+        const maxExcessPlay = plays.find(play => play.id === maxExcessPlayId);
+        const playerCountPerTimeslot = countPlayersPerTimeslot();
+        const minPlayerTimeslot = Number(findKey(playerCountPerTimeslot, Math.min));
+        maxExcessPlay.timeslot = minPlayerTimeslot;
+        bestPlan = changedPlan;
+        if (i % 5 === 0) {
+        //    currentBestPlan = analysePlan(changedPlan, currentBestPlan, i);
+        }
+        if (i >= 10000) {
+            break;
+        };
+    };
+    displayResults(bestPlan);
+}
 
 async function start() {
     await refreshValues("games");
@@ -395,9 +613,8 @@ async function start() {
     players = await getValues("players");
     ratings = calculateRatings(games, players);
     gamesRating = ratings[0];
-    playersChoseGame = ratings[1];
+    chosenGames = ratings[1];
     createTimeslots();
-    //optimizePlan();
     generateForm(fields, containerId);
     const startAlgorithmButton = createButton("startAlgorithm", "Starte Algorithmus", "text", "", () => {startAlgorithm()});
     document.getElementById(containerId).appendChild(startAlgorithmButton);

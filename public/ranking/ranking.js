@@ -41,10 +41,9 @@ const rankingTableButtons = [
 
 function showPlayersOfGame(gameId) {
     const playersOfGame = ratings[1][gameId];
-    const playerNames = playersOfGame.map(playerId => {
-        const player = players.find(p => p.id === playerId);
-        const playerRating = Object.entries(player).find(([key, value]) => key.includes("rank") && value === gameId);
-        return `${player.firstName} ${player.lastName} - Rang ${playerRating[0].replace("rank", "")}`;
+    const playerNames = playersOfGame.map(playerOfGame => {
+        const player = players.find(p => p.id === playerOfGame.playerId);
+        return `${player.firstName} ${player.lastName} - Rang ${playerOfGame.rank}`;
     });
     alert(`Spieler, die dieses Spiel gewählt haben:\n\n${playerNames.join("\n")}`);
 }
