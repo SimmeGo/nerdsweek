@@ -1,19 +1,21 @@
 # Nerdsweek-Webapp
-Diese Webapp dient dazu, das mehrtägige Brettspielevent Nerdsweek besser organiseren und planen zu können. Dabei wird es in Zukunft viele Aufgaben wie Anmeldung, Brettspielverwaltung und Erstellung von Plänen übernehmen.
+Diese Webapp dient dazu, das mehrtägige Brettspielevent Nerdsweek besser zu organiseren und zu planen. Künftig soll sie Aufgaben wie Anmeldung, Brettspielverwaltung und Erstellung von Plänen übernehmen.
 
 ![Startseite der Nerdsweek](/images/Startseite_Nerdsweek.png)
 
 ## Funktionen
 
-### Einmalige Anmeldung von Teilnehmern zur Nerdsweek
-Diejenigen, die an der nächsten Nerdsweek teilnehmen wollen, können sich über einen Klick auf den großen Nerdsweek-Banner-Button anmelden. Es wird ein Formular angezeigt, in dem sie ihren Namen und ihre Spielpräferenzen angeben können.
+### Anmeldung von Teilnehmenden zur Nerdsweek
+Diejenigen, die an der nächsten Nerdsweek teilnehmen möchten, können sich über einen Klick auf den großen Nerdsweek-Banner-Button anmelden. Anschließend wird ein Formular angezeigt, in dem sie ihren Namen und ihre Spielpräferenzen angeben können.
 
 ### Verwaltung der Nerdsweek über den Adminbereich
-Der Adminbereich ist nur mit passenden Zugangsdaten zu erreichen. Derzeit besteht ein Admin-Nutzerkonto. Außerdem sind bereits folgende Funktionen implementiert:
+Der Adminbereich ist nur mit passenden Zugangsdaten zu erreichen. Derzeit besteht ein Admin-Nutzerkonto.
+
+Folgende Funktionen sind bereits implementiert:
 - Verwaltung und Bearbeitung der Spieledatenbank
 - Verwaltung und Bearbeitung der Teilnehmerliste
-- Einsicht in Spielerpräferenzen und daraus resultierendes Spieleranking
-- Erste Implementierung eines Planungsalgorithmus, der über viele Durchläufe den besten Plan mit den derzeit gegebenen Einstellungen findet und Unstimmigkeiten feststellt
+- Einsicht in Spielerpräferenzen und das daraus resultierendes Spieleranking
+- Erste Implementierung eines Planungsalgorithmus, der durch viele Durchläufe den besten Plan mit den derzeit gegebenen Einstellungen findet und Unstimmigkeiten feststellt
 
 ![Admin-Bereich](/images/Adminbereich_Nerdsweek.png)
 
@@ -21,22 +23,22 @@ Der Adminbereich ist nur mit passenden Zugangsdaten zu erreichen. Derzeit besteh
 - Frontend:
     - HTML
     - CSS
-    - Javascript
-    - DOM-API
+    - JavaScript
+    - DOM API
 - Backend:
     - Node.js
     - Express
-    - Javascript
+    - JavaScript
 - Datenbank:
     - MySQL
     - mysql2
 
 ## Architektur und technische Entscheidungen
-- **Frontend und Backend sind getrennt.** Das Frontend kommuniziert über HTTP-Anfragen mit dem Express-Server.
-- **MySQL dient als zentrale Datenhaltung.** Alle Änderungen werden dauerhaft in der Datenbank gespeichert.
-- **Wiederverwendbare Komponenten.** Formulare und Tabellen werden durch allgemeine Funktionen erzeugt und für verschiedene Datenarten (z. B. Spiele und Teilnehmer) wiederverwendet.
-- **Zentrale Datenverwaltung.** Gemeinsam genutzte Daten werden über ein zentrales Modul verwaltet, um Redundanzen zu vermeiden.
-- **Asynchrone Datenbankzugriffe.** Die Kommunikation mit der Datenbank erfolgt über async/await.
+- **Getrenntes Frontend und Backend:** Das Frontend kommuniziert über HTTP-Anfragen mit dem Express-Server.
+- **MySQL als zentrale Datenhaltung:** Alle Änderungen werden dauerhaft in der Datenbank gespeichert.
+- **Wiederverwendbare Komponenten:** Formulare und Tabellen werden durch allgemeine Funktionen erzeugt und für verschiedene Datenarten (z. B. Spiele und Teilnehmer) wiederverwendet.
+- **Zentrale Datenverwaltung:** Gemeinsam genutzte Daten werden über ein zentrales Modul verwaltet, um Redundanzen zu vermeiden.
+- **Asynchrone Datenbankzugriffe:** Die Kommunikation mit der Datenbank erfolgt über async/await.
 ## Lokal starten
 
 ### Voraussetzungen
@@ -51,33 +53,37 @@ Der Adminbereich ist nur mit passenden Zugangsdaten zu erreichen. Derzeit besteh
 4. eine `.env`-Datei im Projektverzeichnis erstellen
 
 ### Inhalt der .env
-```DB_HOST=localhost```
-```DB_USER=[deinen Nutzernamen hier eingeben]```
-```DB_PASSWORD=[dein Passwort hier festlegen]```
-```DB_NAME=[deinen Datenbank-Namen hier hinterlegen]```
+```js
+DB_HOST=localhost
+DB_USER=[deinen Nutzernamen hier eingeben]
+DB_PASSWORD=[dein Passwort hier festlegen]
+DB_NAME=[deinen Datenbank-Namen hier hinterlegen]```
 
 ### Projekt starten
-Starte den Befehl
+Starte im Projektverzeichnis folgenden Befehl:
+
 ```npm run dev```
-in deinem Projektverzeichnis.
-Die benötigten mySQL-Tabellen müssen derzeit händisch erstellt werden. Eine kleine Hilfe dafür findet sich in der Datei createTables.js im Projektverzeichnis. Welche Tabellen und Spalten aktuell benötigt werden, kann vor allem dem Code aus /server/index.js entnommen werden.
+
+
+Die benötigten MySQL-Tabellen müssen derzeit manuell erstellt werden. Eine kleine Hilfestellung dafür befindet sich in der Datei createTables.js im Projektverzeichnis. Welche Tabellen und Spalten aktuell benötigt werden, lässt sich insbesondere dem Code in /server/index.js entnehmen.
 
 ## Ausblick
 
 ### Geplante nächste Schritte
 - Ausbau und Verbesserung des Planungsalgorithmus
-- Ausbau des Anmeldebereichs für Teilnehmer um weitere Formularfelder wie E-Mail-Adresse, Zimmerwünsche usw.
+- Ausbau des Anmeldebereichs um weitere Formularfelder wie E-Mail-Adresse, Zimmerwünsche usw.
 - weitere Gestaltung der Seite mit CSS
-- Personalisierte Links, die es einem Teilnehmer ermöglichen, seine Anmeldung zu bearbeiten
+- Personalisierte Links, über die Teilnehmende ihre Anmeldung bearbeiten können
 
 ### Mittelfristige Ziele
-- Suchfunktion für die einzelnen Tabellen etablieren
-- Umgestaltung der Anmeldeseite (Spiele sollen mittels Kacheln anwählbar werden)
+- Suchfunktion für die einzelnen Tabellen
+- Umgestaltung der Anmeldeseite, sodass Spiele über Kacheln anwählbar sind
 - Verbesserung der Fehlerhandhabung
-- Implementierung von Rollen- und Rechtemanagement
+- Implementierung eines Rollen- und Rechtemanagement
 - Verbesserung der Datensicherheit
+– Optisch ansprechende individuelle Gestaltung der Website
 
 ### Langfristige Ideen
 - Möglichkeit der Personalisierung des Anmeldebereichs über den Adminbereich
-- Anlegen von mehreren getrennten Events mit jeweils eigener Verwaltung
+- Anlegen mehrerer getrennter Events mit jeweils eigener Verwaltung
 - Neugestaltung des Admin-Bereichs im Frontend mittels CSS
