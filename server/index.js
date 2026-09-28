@@ -5,6 +5,8 @@ const app = express();
 app.use(express.static("public"));
 app.use(express.json());
 
+
+
 const PORT = 3000;
 
 const db = require("./database");
@@ -16,6 +18,7 @@ const session = require("express-session");
 const path = require("path");
 
 let gameList = [];
+let gameCardList = [];
 let playersList = [];
 
 app.use(session({
@@ -115,7 +118,8 @@ async function createDataEntry(dataId, tableName, firstKey, firstObject) {
             [firstObject]
             );
         console.log(result.insertId);
-        const newDataId = result.insertId;
+        let newDataId;
+        if (tableName === "gameCards") newDataId = firstObject; else newDataId = result.insertId;
         console.log(newDataId);
         const message = " erfolgreich angelegt!";
         const returnResult = {
@@ -133,13 +137,14 @@ async function writeData(data, dataColumns, tableName, dataId) {
     let rows;
     let table;
     let tableGender;
-    if (tableName === "games") {
+    if (tableName === "games" || tableName === "gameCards") {
         table = "Spiel";
         tableGender = "Das"
     } else if (tableName === "players") {
         table = "Spieler";
         tableGender = "Der";
     };
+    console.log(dataColumns[0], data[dataColumns[0]]);
     const newEntryResult = await createDataEntry(dataId, tableName, dataColumns[0], data[dataColumns[0]]);
     let newDataId;
     if (newEntryResult.success === true) {
@@ -166,7 +171,9 @@ async function writeData(data, dataColumns, tableName, dataId) {
     if (!newEntryResult.type) {
         newEntryResult.type = "bearbeitet";
     }
-    const message = `${tableGender} ${table} ${Object.values(dataEntry)[1]} wurde erfolgreich ${newEntryResult.type}!`;
+    let object;
+    if (tableName = "gameCards") object = ""; else object = Object.values(dataEntry)[1];
+    const message = `${tableGender} ${table} ${object} wurde erfolgreich ${newEntryResult.type}!`;
     return { message: message, success: newEntryResult.success, title: Object.values(dataEntry)[1], newDataId: newDataId };
 }
 
@@ -204,6 +211,25 @@ app.get("/games", async (req, res) => {
         game.playerCount.excluded = excluded_player_count.map(row => row.player_count);
     };
     res.json(gameList);
+});
+
+app.get("/gameCards", async (req, res) => {
+    const [gameCards_data] = await db.query(
+        "SELECT * FROM gameCards"
+    );
+    gameCardList.length = 0;
+    for (const gameCard_entry of gameCards_data) {
+        const gameCard = {
+            id: gameCard_entry.id,
+            gameCover: gameCard_entry.gameCover,
+            primaryGameColor: gameCard_entry.primaryGameColor,
+            secondaryGameColor: gameCard_entry.secondaryGameColor,
+            highlightGameColor: gameCard_entry.highlightGameColor
+        }
+        gameCardList.push(gameCard);
+    }
+    console.log(gameCardList);
+    res.json(gameCardList);
 });
 
 app.get("/players", async (req, res) => {
@@ -379,6 +405,18 @@ app.post("/games", async (req, res) => {
             [values]
         );
     };
+    res.json(result);
+});
+
+app.post("/gameCards", async (req, res) => {
+    const { id, gameCover, primaryGameColor, secondaryGameColor, highlightGameColor, dataId, del  } = req.body;
+    const gameColumns = Object.keys(req.body).filter(
+        key => !["dataId", "del"].includes(key)
+    );
+    let thisGameId = req.body.dataId;
+
+    const result = await writeData(req.body, gameColumns, "gameCards", thisGameId);
+    console.log(result);
     res.json(result);
 });
 

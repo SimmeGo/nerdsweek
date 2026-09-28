@@ -71,12 +71,14 @@ Die benötigten MySQL-Tabellen müssen derzeit manuell erstellt werden. Eine kle
 
 ### Geplante nächste Schritte
 - Ausbau und Verbesserung des Planungsalgorithmus
+– visuelle Darstellung des erstellten Plans
 - Ausbau des Anmeldebereichs um weitere Formularfelder wie E-Mail-Adresse, Zimmerwünsche usw.
 - weitere Gestaltung der Seite mit CSS
 - Personalisierte Links, über die Teilnehmende ihre Anmeldung bearbeiten können
 
 ### Mittelfristige Ziele
 - Suchfunktion für die einzelnen Tabellen
+– manuelle Anpassbarkeit des Plans via Drag-and-Drop
 - Umgestaltung der Anmeldeseite, sodass Spiele über Kacheln anwählbar sind
 - Verbesserung der Fehlerhandhabung
 - Implementierung eines Rollen- und Rechtemanagement

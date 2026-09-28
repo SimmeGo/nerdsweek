@@ -1,8 +1,24 @@
 import { generateForm, createButton } from "/shared/forms.js";
 
+class Timeslot {
+
+    constructor(id, date, startTime, playCount) {
+
+        this.id = id;
+        this.date = date;
+        this.startTime = startTime;
+        this.playCount = playCount;
+
+    }
+    assignGame(game) { }
+
+}
+
 let dataStore = {
     games: [],
-    players: []
+    gameCards: [],
+    players: [],
+    timeslots: []
 };
 
 export function getValues(dataType) {
@@ -14,17 +30,10 @@ export async function refreshValues(dataType) {
 }
 
 async function loadValues(dataType) {
+    if (dataType === "timeslots") return createTimeslots();
     const response = await fetch(`/${dataType}`, {cache: "no-store"});
     console.log(response.json);
     return await response.json();
-    /*const response = await fetch(`/${dataType}`);
-
-    console.log("Status:", response.status);
-
-    const text = await response.text();
-    console.log(text);
-
-    return JSON.parse(text);*/
 }
 
 export function translateValues(values) {
@@ -77,18 +86,9 @@ export function editDataInDatabase(containerID, dataId, fields, data, multipleFu
     }
     const formContainer = document.getElementById(containerID);
     const dataEntry = data.find(dataEntry => dataEntry.id === dataId);
-    fields.forEach(element => {
-        const input = document.getElementById(element.name);
-        if (element.multiple) {
-            multipleFunction(element.name);
-            const select = document.getElementById(element.name)
-            for (const option of select.options) {
-                option.selected = element.get(dataEntry).includes(Number(option.value));
-            }
-        } else {
-        input.value = element.get(dataEntry);
-        };
-    });
+
+    fillInputElements(fields, data, dataId);
+    
     const saveChangesButton = createButton("saveChangesButton", "Speichern", "text", "", async () => {
         const values = checkDataBeforeServer(fields, containerID);
         console.log(values);
@@ -101,6 +101,23 @@ export function editDataInDatabase(containerID, dataId, fields, data, multipleFu
     });
     formContainer.appendChild(cancelButton);
     formContainer.appendChild(saveChangesButton);
+}
+
+export function fillInputElements(fields, data, dataId) {
+    const dataEntry = data.find(dataEntry => dataEntry.id === dataId);
+    if (!dataEntry) return;
+    fields.forEach(element => {
+        const input = document.getElementById(element.name);
+        if (element.multiple) {
+            multipleFunction(element.name);
+            const select = document.getElementById(element.name)
+            for (const option of select.options) {
+                option.selected = element.get(dataEntry).includes(Number(option.value));
+            }
+        } else {
+        input.value = element.get(dataEntry);
+        };
+    });
 }
 
 export async function deleteDataFromDatabase(data, dataId, tableFunction, sendFunction) {
@@ -143,14 +160,20 @@ export async function sendPlayerToServer(player_data, playerId, del) {
 export function getValuesfromForm(fields) {
     let values = [];
     for (const field of fields) {
+        const content = document.getElementById(field.name).value;
         console.log(`Der Wert von ${field.name} ist ${document.getElementById(field.name).value}.`);
-        if ( document.getElementById(field.name).value === "" || document.getElementById(field.name).value === "-1" ) {
+        if ( content === "" || content === "-1" ) {
             if ( field.mandatory ) {
                 console.log(`${field.name} ist ein Pflichtfeld!`)
-                return null;
+                return "Fülle bitte alle Felder mit einem * aus, bevor du fortfährst.";
             }
             if ( field.type === "number" ) {
-                document.getElementById(field.name).value = 0;
+                content = 0;
+            }
+        }
+        if (field.color) {
+            if (/[^a-fA-F0-9#]/.test(content) || content.length !== 7) {
+                return "Bitte gib in allen Farb-Eingabefeldern einen gültigen Hexadezimal-Farbcode im Format #12AB45 ein."
             }
         }
         if ( field.multiple ) {
@@ -158,21 +181,36 @@ export function getValuesfromForm(fields) {
             values.push(Array.from(multipleSelect.selectedOptions).map(option =>
         Number(option.value)));
         } else {
-            values.push(document.getElementById(field.name).value);
+            values.push(content);
         }
     };
-    console.log(values);
     return values;
 }
 
 export function checkDataBeforeServer(fields, containerID) {
     const data = getValuesfromForm(fields);
     const formContainer = document.getElementById(containerID);
-    if (data === null) {
+    if (!Array.isArray(data)) {
         const errorMessage = document.createElement("p");
-        errorMessage.textContent = "Fülle bitte alle Felder mit einem * aus, bevor du fortfährst."
+        errorMessage.textContent = data;
         formContainer.appendChild(errorMessage);
         return null;
     }
     return data;
+}
+
+function createTimeslots() {
+    let timeslots = [];
+    const dates = ["19.05.", "20.05.", "20.05.", "21.05.", "21.05.", "22.05.", "22.05.", "23.05."]
+    for (const timeslot of TIMESLOTS) {
+        let startTime;
+        if (timeslot % 2 === 0) {
+            startTime = "10 Uhr";
+        } else {
+            startTime = "17 Uhr";
+        };
+        const timeslotEntry = new Timeslot(timeslot, dates[timeslot - 1], startTime, null);
+        timeslots.push(timeslotEntry);
+    }
+    return timeslots;
 }

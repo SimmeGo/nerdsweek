@@ -69,7 +69,7 @@ button svg {
 html {
     font-family: "Type Light Sans";
     font-size: 20px;
-    background-color: var(--primColLighter);
+    background-color: #415761;
 }
 
 @media (max-width: 600px) {
@@ -156,9 +156,14 @@ table button {
   color: var(--primCol);
 }
 
-input, select {
+input, select, textarea {
     background-color: var(--bgColLight);
     border-radius: 0;
+}
+
+input:read-only,
+textarea:read-only {
+    background-color: #b3a5a6;
 }
 
 .inner-edge {

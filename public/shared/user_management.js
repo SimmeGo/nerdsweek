@@ -11,7 +11,7 @@ export async function checkLogin() {
 export async function checkLoginStatus() {
     const loginSvg = "M6.224 21.17a4.04 4.04 0 1 0-.185-8.077 4.04 4.04 0 0 0 .185 8.077ZM9 14 20 3m-5.757 6.257 3.5 3.5 1.129-3.129L22 8.5 18.5 5";
     const navigationContainer = document.getElementById("navigationContainer");
-    navigationContainer.innerHTML = "";
+    //navigationContainer.innerHTML = "";
     const userData = await checkLogin();
     console.log(userData);
 
@@ -56,7 +56,7 @@ export async function checkLoginStatus() {
         setupInnerEdge(summary);
     } else {
         const loginDialogButton = createButton("loginDialogButton", loginSvg, "image", "roundButton", () => {createLoginDialog()});
-        navigationContainer.prepend(loginDialogButton);
+        //navigationContainer.prepend(loginDialogButton);
     };
 }    
 

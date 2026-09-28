@@ -1,4 +1,4 @@
-import { addDataToDatabase, deleteDataFromDatabase, editDataInDatabase, getValues } from "../shared/data_management.js";
+import { addDataToDatabase, deleteDataFromDatabase, editDataInDatabase, fillInputElements, getValues, refreshValues } from "../shared/data_management.js";
 import { 
     generateTableHead,
     generateTableBody,
@@ -9,97 +9,139 @@ import {
 
 let playerCount = [];
 let games = [];
-let gameId = "";
+let gameCards = [];
 let fieldsWithoutID = [];
 
 const fields = [
-        { 
-            label: "ID",
-            name: "id",
-            get: game => game.id
-        },
-        { 
-            element: "input", 
-            label: "Titel", 
-            type: "text", 
-            name: "title",
-            get: game => game.title, 
-            mandatory: true 
-        },
-        { 
-            element: "input", 
-            label: "Minimale Spieleranzahl", 
-            type: "number", 
-            name: "minPlayers", 
-            get: game => game.playerCount.min, 
-            mandatory: true 
-        },
-        { 
-            element: "input", 
-            label: "Maximale Spieleranzahl", 
-            type: "number", 
-            name: "maxPlayers", 
-            get: game => game.playerCount.max, 
-            mandatory: true 
-        },
-        {
-            element: "select", 
-            label: "Bevorzugte Spieleranzahl",
-            type: "number", 
-            name: "preferredPlayers", 
-            options: [], 
-            multiple: true, 
-            get: game => game.playerCount.preferred?.join(", ")  },
-        { 
-            element: "select", 
-            label: "Ausgeschlossene Spieleranzahl", 
-            type: "number", 
-            name: "excludedPlayers", 
-            options: [], 
-            multiple: true, 
-            get: game => game.playerCount.excluded?.join(", ") },
-        { 
-            element: "input", 
-            label: "Minimale Spieldauer", 
-            type: "number", 
-            name: "minDuration", 
-            get: game => game.duration.min,
-            mandatory: true
-        },
-        {
-            element: "input", 
-            label: "Maximale Spieldauer", 
-            type: "number", 
-            name: "maxDuration", 
-            get: game => game.duration.max,
-            mandatory: true
-        },
-        {
-            element: "input", 
-            label: "Erklärdauer", 
-            type: "number", 
-            name: "explainingTime", 
-            get: game => game.explainingTime,
-            mandatory: true
-        },
-        {
-            element: "input", 
-            label: "Tischanzahl", 
-            type: "number", 
-            name: "tableCount", 
-            get: game => game.tableCount,
-            mandatory: true
-        },
-        {
-            element: "select", 
-            label: "Typ", 
-            type: "text", 
-            name: "type", 
-            options: ["Koop: leicht", "Koop: normal", "Koop: schwer", "Koop: sehr schwer", "Punkte", "ohne Punkte", "Team"],
-            multiple: false, get: game => game.type,
-            mandatory: true
-        },
-    ];
+    { 
+        label: "ID",
+        name: "id",
+        get: game => game.id
+    },
+    { 
+        element: "input", 
+        label: "Titel", 
+        type: "text", 
+        name: "title",
+        get: game => game.title, 
+        mandatory: true 
+    },
+    { 
+        element: "input", 
+        label: "Minimale Spieleranzahl", 
+        type: "number", 
+        name: "minPlayers", 
+        get: game => game.playerCount.min, 
+        mandatory: true 
+    },
+    { 
+        element: "input", 
+        label: "Maximale Spieleranzahl", 
+        type: "number", 
+        name: "maxPlayers", 
+        get: game => game.playerCount.max, 
+        mandatory: true 
+    },
+    {
+        element: "select", 
+        label: "Bevorzugte Spieleranzahl",
+        type: "number", 
+        name: "preferredPlayers", 
+        options: [], 
+        multiple: true, 
+        get: game => game.playerCount.preferred?.join(", ")  },
+    { 
+        element: "select", 
+        label: "Ausgeschlossene Spieleranzahl", 
+        type: "number", 
+        name: "excludedPlayers", 
+        options: [], 
+        multiple: true, 
+        get: game => game.playerCount.excluded?.join(", ") },
+    { 
+        element: "input", 
+        label: "Minimale Spieldauer", 
+        type: "number", 
+        name: "minDuration", 
+        get: game => game.duration.min,
+        mandatory: true
+    },
+    {
+        element: "input", 
+        label: "Maximale Spieldauer", 
+        type: "number", 
+        name: "maxDuration", 
+        get: game => game.duration.max,
+        mandatory: true
+    },
+    {
+        element: "input", 
+        label: "Erklärdauer", 
+        type: "number", 
+        name: "explainingTime", 
+        get: game => game.explainingTime,
+        mandatory: true
+    },
+    {
+        element: "input", 
+        label: "Tischanzahl", 
+        type: "number", 
+        name: "tableCount", 
+        get: game => game.tableCount,
+        mandatory: true
+    },
+    {
+        element: "select", 
+        label: "Typ", 
+        type: "text", 
+        name: "type", 
+        options: ["Koop: leicht", "Koop: normal", "Koop: schwer", "Koop: sehr schwer", "Punkte", "ohne Punkte", "Team"],
+        multiple: false,
+        get: game => game.type,
+        mandatory: true
+    },
+];
+
+const cardFields = [
+    { 
+        element: "input",
+        label: "ID",
+        name: "id",
+        type: "number",
+        get: gameCard => gameCard.id
+    },
+    {
+        element: "input",
+        label: "Bildpfad zum Spielcover",
+        type: "text",
+        name: "gameCover",
+        get: gameCard => gameCard.gameCover,
+    },
+    {
+        element: "input",
+        label: "Primärer HEX-Farbcode",
+        type: "color",
+        name: "primaryGameColor",
+        get: gameCard => gameCard.primaryGameColor,
+        color: true
+    },
+    {
+        element: "input",
+        label: "Sekundäre HEX-Farbcode",
+        type: "color",
+        name: "secondaryGameColor",
+        get: gameCard => gameCard.secondaryGameColor,
+        color: true
+    },
+    {
+        element: "input",
+        label: "Highlight-HEX-Farbcode",
+        type: "color",
+        name: "highlightGameColor",
+        get: gameCard => gameCard.highlightGameColor,
+        color: true
+    },
+]
 
 const containerID = "formContainer";
 
@@ -112,8 +154,54 @@ const addSvg = "M21 12H3m9-9v18";
 
 const gamesTableButtons = [
     { name: "editGameButton", label: editSvg, contentType: "image", function: game => editDataInDatabase(containerID, game.id, fieldsWithoutID, games, spawnPlayerCountOnEdit, sendGameToServer, generateGamesTableBody, false) },
-    { name: "deleteGameButton", label: deleteSvg, contentType: "image", function: game => deleteDataFromDatabase(games, game.id, generateGamesTableBody, sendGameToServer) }
-]
+    { name: "deleteGameButton", label: deleteSvg, contentType: "image", function: game => deleteDataFromDatabase(games, game.id, generateGamesTableBody, sendGameToServer) },
+    { name: "showGameCardButton", label: "Card", contentType: "text", function: game => openGameCardStatsDialog(game.id)}
+];
+
+function openGameCardStatsDialog(gameId) {
+    const gameCardStats = document.getElementById("gameCardStats");
+    const dialog = document.getElementById("gameCardDialog");
+    dialog.showModal();
+    const closeButton = createButton("closeButton", "X", "text", "", () => dialog.close());
+    generateForm(cardFields, "gameCardStats");
+    //gameCardStats.appendChild(closeButton);
+    const form = document.getElementById("gameCardStatsForm");
+
+    const gameCard = gameCards.find(gameCard => gameCard.id === gameId);
+    let dataId;
+    if (!gameCard) {
+        dataId = 0;
+    } else {
+        dataId = gameId;
+    }
+
+    gameCardStats.insertBefore(closeButton, form);
+    const editButton = createButton("editButton", "Bearbeiten", "text", "", () => {
+        for (const field of form.elements) {
+            field.readOnly = false;
+        };
+        document.getElementById("editButton").remove();
+        const saveButton = createButton("saveChangesButton", "Speichern", "text", "", async () => {
+            await addDataToDatabase(dataId, cardFields, sendGameCardToServer, "gameCardStats", null);
+            await refreshValues("gameCards");
+            gameCards = await getValues("gameCards");  
+            gameCardStats.prepend(closeButton);
+        });
+        gameCardStats.appendChild(saveButton);
+    });
+    gameCardStats.appendChild(editButton);
+
+    cardFields.forEach(element => {
+        const input = document.getElementById(element.name);
+        if (gameCard) input.value = element.get(gameCard);
+        input.readOnly = true;
+    });
+
+    console.log(gameCards);
+    fillInputElements(cardFields, gameCards, gameId);
+    const idField = document.getElementById("id");
+    if (idField.value === "") idField.value = gameId;
+}
 
 async function sendGameToServer(game_data, gameId, del) {
     const response = await fetch("/games", {
@@ -133,6 +221,25 @@ async function sendGameToServer(game_data, gameId, del) {
             tableCount: game_data[8],
             type: game_data[9],
             gameId: gameId,
+            del: del
+        })
+    });
+    return await response.json();
+}
+
+async function sendGameCardToServer(gameCard_data, dataId, del) {
+    const response = await fetch("/gameCards", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            id: gameCard_data[0],
+            gameCover: gameCard_data[1],
+            primaryGameColor: gameCard_data[2],
+            secondaryGameColor: gameCard_data[3],
+            highlightGameColor: gameCard_data[4],
+            dataId: dataId,
             del: del
         })
     });
@@ -174,12 +281,29 @@ function createPreferredAndExcludedPlayerCountList() {
     }
 }
 
+async function addGameCardToDatabase(dataId, fields, sendFunction, containerID, join) {
+    const formContainer = document.getElementById(containerID);
+    const values = checkDataBeforeServer(fields, containerID);
+    console.log(values);
+    if ( values === null ) {
+        return;
+    }
+    const result = await sendFunction(values, dataId, false);
+    console.log(result);
+    if (join) {
+        formContainer.innerHTML = `Herzlich Willkommen, ${result.title}. Du hast dich erfolgreich zur Nerdsweek angemeldet!`;
+    } else {
+        formContainer.innerHTML = result.message;
+    };
+    return result.success;
+}
+
 function addGameToDatabaseButton() {
     generateForm(fieldsWithoutID, containerID);
     console.log(document.getElementById("preferredPlayers"));
     console.log(document.getElementById("excludedPlayers"));
     const addGameToDatabaseButton = createButton("addGameToDatabase", "Spiel hinzufügen", "text", "", async () => {
-        const gameId = 0; // game_id wird später an den Server übergeben. Ist sie 0, sagt dies dem Server, dass das Spiel neu in der Datenbank angelegt werden muss.
+        const gameId = 0; // gameId wird später an den Server übergeben. Ist sie 0, sagt dies dem Server, dass das Spiel neu in der Datenbank angelegt werden muss.
         await addDataToDatabase(gameId, fieldsWithoutID, sendGameToServer, containerID);
         generateGamesTableBody();
     });
@@ -198,7 +322,9 @@ async function generateGamesTableBody() {
     games = await generateTableBody("gamesTableBody", "games", gamesTableButtons, fields);
 }
 
-function start() {
+async function start() {
+    await refreshValues("gameCards");
+    gameCards = await getValues("gameCards");
     fieldsWithoutID = fields.slice(1);
     createAndShowBackButton("/admin", "gameButtons");
     const addGameButton = createButton("addGameButton", addSvg, "image", "roundButton", () => {

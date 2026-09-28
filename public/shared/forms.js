@@ -1,4 +1,4 @@
-import { addDataToDatabase, getValues, refreshValues, translateValues } from "/shared/data_management.js";
+import { addDataToDatabase, getValues, refreshValues, translateValues } from "../shared/data_management.js";
 
 export function createButton(id, label, contentType, cssClass, onClick) {
     const button = document.createElement("button");
@@ -39,7 +39,7 @@ export function generateForm(fields, containerID) {
     formContainer.innerHTML = ""; // Clear previous content
 
     const form = document.createElement("form");
-    form.id = "gameForm";
+    form.id = `${containerID}Form`;
     
     fields.forEach(field => {
         const div = document.createElement("div");
@@ -85,16 +85,11 @@ export function generateForm(fields, containerID) {
     formContainer.appendChild(form);
 }
 
-export function createFieldsForPlayer() {
-    let fields = [
-        { name: "id", label: "ID", get: player => player.id },
-        { element: "input", type: "text", name: "name", label: "Vorname", get: player => player.firstName, mandatory: true},
-        { element: "input", type: "text", name: "surname", label: "Nachname", get: player => player.lastName, mandatory: true}
-    ]
+export function createRankFields() {
+    let fields;
     for (let i = 1; i <= 8; i++) {
         fields.push({ element: "select", type: "text", name: `rank${i}`, label: `Rang ${i}`, get: player => player["rank" + i], options: "", mandatory: true });    
     }
-    console.log(fields);
     return fields;
 }
 
@@ -229,7 +224,7 @@ export function calculateRatings(games, players) {
 }
 
 export function calculateRankingScoreForPlayer(rankNumber) {
-    return Math.round( (9 - rankNumber) ** (1 / 1.5) * 100);
+    return Math.round( (9 - rankNumber) ** (1.5) * 100);
 }
 
 export function shuffle(array) {
@@ -241,4 +236,18 @@ export function shuffle(array) {
     }
 
     return shuffled;
+}
+
+export function calculateAverage(array) {
+    return array.reduce((sum, number) => sum + number, 0) / array.length;
+}
+
+export function setHexColor(property, hex) {
+    const value = hex.replace("#", "");
+
+    property.rgb(
+        parseInt(value.slice(0, 2), 16),
+        parseInt(value.slice(2, 4), 16),
+        parseInt(value.slice(4, 6), 16),
+    );
 }

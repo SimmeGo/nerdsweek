@@ -71,12 +71,6 @@ function createTableValues() {
     return values;
 }
 
-
-
-function countPlayerChoice() {
-
-}
-
 async function start() {
     await refreshValues("games");
     games = await getValues("games");
