@@ -1,13 +1,243 @@
-.rive-frame {
+@import url("../shared/global.css");
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.game-cards-container {
   width: 100%;
   aspect-ratio: 16 / 9;
   touch-action: pan-y;
-
+  flex-shrink: 0;
 }
 
-#riveCanvas {
+.game-cards-canvas {
   display: block;
   width: 100%;
   height: 100%;
   touch-action: pan-y;
+}
+
+#nerdyCanvas {
+  width: 20%;
+  min-width: 120px;
+  max-width: 300px;
+  touch-action: none;
+  position: absolute;
+  right: 40%;
+  bottom: 3rem;
+  aspect-ratio: 1 / 1;
+}
+
+#nerdyCanvas:hover {
+  cursor: grab;
+}
+
+#nerdyCanvas:active {
+  cursor: grabbing;
+}
+
+#welcome {
+  margin-inline: auto;
+  align-content: center;
+}
+
+
+.button-container {
+  height: auto;
+  
+  width: 100%;  
+  justify-content: space-between;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+
+.button-container canvas {
+  flex: 0 0 auto;
+  height: clamp(30px, 13vw, 100px);
+  width: auto;
+  aspect-ratio: var(--button-ratio);
+}
+
+.button-container canvas:hover {
+  cursor: pointer;
+}
+
+#letsGoCanvas {
+  height: clamp(50px, 17vw, 200px);
+  width: auto;
+  justify-content: left;
+}
+
+#continueCanvas {
+  margin-left: auto;
+}
+
+#toGameSelectionCanvas {
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 500px) {
+  .button-container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .button-container canvas {
+    flex: none;
+    height: clamp(30px, 18vw, 100px);
+    width: 100%;
+  }
+}
+
+#joinForm {
+  width: calc(100% - 2rem);
+  max-width: 1200px;
+  height: 0px;
+  overflow: hidden;
+  touch-action: pan-y;
+  margin-inline: auto;
+  /*margin-top: 2rem 0;*/
+  position: relative;
+  color: white;
+  transition: height 1s;
+  
+  display: flex;
+  flex-direction: column;
+  
+  background-color: black;
+  border: 0.5rem solid var(--primCol);
+  box-sizing: border-box;
+  box-shadow: 0.25rem 0.25rem 0 var(--bgCol);
+  padding: 1rem;
+  padding-bottom: 1rem;
+}
+
+#joinForm p {
+  color: white;
+  margin-inline: auto;
+}
+
+.form-container {
+  flex: auto;
+}
+
+.form-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+}
+
+.form-container div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  position: inherit;
+}
+
+.fieldset {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  position: inherit;
+}
+
+.fieldset > legend {
+    max-width: 100%;
+    box-sizing: border-box;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.fieldset.grid-3to1 {
+    grid-template-columns: 1fr;
+}
+
+#attendance {
+    grid-template-columns: 1fr;
+}
+
+.double-width {
+    grid-column: auto;
+}
+
+.selectLabel {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+}
+
+@media (min-width: 500px) {
+    #attendance {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .fieldset.grid-3to1 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .double-width {
+      grid-column: span 2;
+    }
+
+    .selectLabel {
+      grid-template-columns: auto 1fr;
+    }
+}
+
+@media (min-width: 800px) {
+  #attendance {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.textLabel {
+  display: grid;
+  grid-template-columns: 35fr 65fr;
+}
+
+.radioLabel,
+.checkboxLabel {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.checkboxLabel > span,
+.radioLabel > span {
+    transform: translateY(0.1em);
+}
+
+.radioLabel input,
+.checkboxLabel input {
+  margin: 0;
+}
+
+.completeNerdsweek {
+  grid-column: 1 / -1;
+}
+
+
+@media (max-width: 750px) {
+  #formContainer div label {
+    /* Schaltet auf eine einzige Spalte um, Label und Input nutzen die volle Breite */
+    grid-template-columns: 1fr;
+    gap: 5px;
+    /* Etwas weniger Abstand, wenn sie untereinanderstehen */
+  }
+
+}
+
+@media (max-width: 600px) {
+  #formContainer div {
+    grid-template-columns: 80%;
+  }
 }

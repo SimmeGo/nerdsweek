@@ -19,25 +19,22 @@ const fields = [
         get: game => game.id
     },
     { 
-        element: "input", 
+        element: "text", 
         label: "Titel", 
-        type: "text", 
         name: "title",
         get: game => game.title, 
         mandatory: true 
     },
     { 
-        element: "input", 
+        element: "number", 
         label: "Minimale Spieleranzahl", 
-        type: "number", 
         name: "minPlayers", 
         get: game => game.playerCount.min, 
         mandatory: true 
     },
     { 
-        element: "input", 
+        element: "number", 
         label: "Maximale Spieleranzahl", 
-        type: "number", 
         name: "maxPlayers", 
         get: game => game.playerCount.max, 
         mandatory: true 
@@ -59,33 +56,29 @@ const fields = [
         multiple: true, 
         get: game => game.playerCount.excluded?.join(", ") },
     { 
-        element: "input", 
+        element: "number", 
         label: "Minimale Spieldauer", 
-        type: "number", 
         name: "minDuration", 
         get: game => game.duration.min,
         mandatory: true
     },
     {
-        element: "input", 
+        element: "number", 
         label: "Maximale Spieldauer", 
-        type: "number", 
         name: "maxDuration", 
         get: game => game.duration.max,
         mandatory: true
     },
     {
-        element: "input", 
-        label: "Erklärdauer", 
-        type: "number", 
+        element: "number", 
+        label: "Erklärdauer",  
         name: "explainingTime", 
         get: game => game.explainingTime,
         mandatory: true
     },
     {
-        element: "input", 
+        element: "number", 
         label: "Tischanzahl", 
-        type: "number", 
         name: "tableCount", 
         get: game => game.tableCount,
         mandatory: true
@@ -104,39 +97,34 @@ const fields = [
 
 const cardFields = [
     { 
-        element: "input",
+        element: "number",
         label: "ID",
         name: "id",
-        type: "number",
         get: gameCard => gameCard.id
     },
     {
-        element: "input",
+        element: "text",
         label: "Bildpfad zum Spielcover",
-        type: "text",
         name: "gameCover",
         get: gameCard => gameCard.gameCover,
     },
     {
-        element: "input",
+        element: "color",
         label: "Primärer HEX-Farbcode",
-        type: "color",
         name: "primaryGameColor",
         get: gameCard => gameCard.primaryGameColor,
         color: true
     },
     {
-        element: "input",
+        element: "color",
         label: "Sekundäre HEX-Farbcode",
-        type: "color",
         name: "secondaryGameColor",
         get: gameCard => gameCard.secondaryGameColor,
         color: true
     },
     {
-        element: "input",
+        element: "color",
         label: "Highlight-HEX-Farbcode",
-        type: "color",
         name: "highlightGameColor",
         get: gameCard => gameCard.highlightGameColor,
         color: true
@@ -163,9 +151,9 @@ function openGameCardStatsDialog(gameId) {
     const dialog = document.getElementById("gameCardDialog");
     dialog.showModal();
     const closeButton = createButton("closeButton", "X", "text", "", () => dialog.close());
-    generateForm(cardFields, "gameCardStats");
+    const form = generateForm(cardFields, "gameCardStats");
+    form.className = "standardForm";
     //gameCardStats.appendChild(closeButton);
-    const form = document.getElementById("gameCardStatsForm");
 
     const gameCard = gameCards.find(gameCard => gameCard.id === gameId);
     let dataId;
@@ -299,7 +287,8 @@ async function addGameCardToDatabase(dataId, fields, sendFunction, containerID, 
 }
 
 function addGameToDatabaseButton() {
-    generateForm(fieldsWithoutID, containerID);
+    const form = generateForm(fieldsWithoutID, containerID);
+    form.className = "standardForm";
     console.log(document.getElementById("preferredPlayers"));
     console.log(document.getElementById("excludedPlayers"));
     const addGameToDatabaseButton = createButton("addGameToDatabase", "Spiel hinzufügen", "text", "", async () => {

@@ -1,0 +1,29 @@
+@import url("../shared/global.css");
+
+.text {
+    width: auto;
+    margin-inline: auto;
+    justify-content: center;
+    text-align: center;
+}
+
+.adminHeader {
+    font-size: 70px;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: row;
+    margin: 1rem;
+    margin-inline: auto;
+    max-width: 1200px;
+    width: 100%;
+    aspect-ratio: 4 / 1;
+    flex-wrap: wrap;
+}
+
+.menu-button {
+    height: 100%;
+    width: 20%;
+    font-size: 35px;
+}

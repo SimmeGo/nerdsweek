@@ -4,10 +4,12 @@
     width: 100%;
     height: 100%;
     touch-action: pan-y;
+    margin-inline: auto;
 }
 
 #nerdyCanvas {
     display: block;
+    max-width: 900px;
     /*width: auto;
     height: auto;*/
     touch-action: pan-y;
@@ -15,6 +17,9 @@
 }
 
 .navigation {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -141,8 +146,7 @@ form div {
 /* Design für die großen Haupt-Buttons der Startseite.*/
 
 .container {
-    position: absolute;
-    top: 3rem;
+    margin-inline: auto;
 }
 
 .card-container {

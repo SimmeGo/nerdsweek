@@ -62,21 +62,14 @@ class Game {
 
 class Player {
 
-    constructor(id, firstName, lastName, availableTimeSlots, data, rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8) {
+    constructor(id, firstName, lastName, availableTimeslots, data, gamePreferences) {
 
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.availableTimeSlots = availableTimeSlots;
+        this.availableTimeslots = availableTimeslots;
         this.data = data;
-        this.rank1 = rank1;
-        this.rank2 = rank2;
-        this.rank3 = rank3;
-        this.rank4 = rank4;
-        this.rank5 = rank5;
-        this.rank6 = rank6;
-        this.rank7 = rank7;
-        this.rank8 = rank8
+        this.gamePreferences = gamePreferences;
         
     }
 }
@@ -96,10 +89,10 @@ function requireAdmin(req, res, next) {
     next();
 }
 
-async function deleteData(del, dataId, tableName) {
+async function deleteData(del, dataId, tableName, primaryKeyColumn) {
     if (del) {
         await db.query(
-            `DELETE FROM ${tableName} WHERE id = ?`,
+            `DELETE FROM ${tableName} WHERE ${primaryKeyColumn} = ?`,
             [dataId]
         );
         return {
@@ -111,16 +104,13 @@ async function deleteData(del, dataId, tableName) {
 }
 
 async function createDataEntry(dataId, tableName, firstKey, firstObject) {
-    if (dataId === 0) {
-        console.log(dataId);    
+    if (dataId === 0) {  
         const [result] = await db.query(
             `INSERT INTO ${tableName} (${firstKey}) VALUES (?)`,
             [firstObject]
             );
-        console.log(result.insertId);
         let newDataId;
-        if (tableName === "gameCards") newDataId = firstObject; else newDataId = result.insertId;
-        console.log(newDataId);
+        if (tableName === "gameCards" || tableName === "timeslots" || tableName === "game_preferences") newDataId = firstObject; else newDataId = result.insertId;
         const message = " erfolgreich angelegt!";
         const returnResult = {
             dataId: newDataId,
@@ -133,10 +123,11 @@ async function createDataEntry(dataId, tableName, firstKey, firstObject) {
     return {success: false};
 }
 
-async function writeData(data, dataColumns, tableName, dataId) {
+async function writeData(data, dataColumns, tableName, dataId, primaryKeyColumn) {
     let rows;
     let table;
     let tableGender;
+    console.log("Wir sind im Durchlauf", tableName);
     if (tableName === "games" || tableName === "gameCards") {
         table = "Spiel";
         tableGender = "Das"
@@ -147,24 +138,25 @@ async function writeData(data, dataColumns, tableName, dataId) {
     console.log(dataColumns[0], data[dataColumns[0]]);
     const newEntryResult = await createDataEntry(dataId, tableName, dataColumns[0], data[dataColumns[0]]);
     let newDataId;
+    console.log("Das Result ist", newEntryResult);
     if (newEntryResult.success === true) {
         newDataId = newEntryResult.dataId;
     } else {
         newDataId = dataId;
     };
     [rows] = await db.query(
-            `SELECT * FROM ${tableName} WHERE id = ?`,
+            `SELECT * FROM ${tableName} WHERE ${primaryKeyColumn} = ?`,
             [newDataId]
     );
     const dataEntry = rows[0];
-    const delResult = await deleteData(data.del, dataId, tableName);
-    if (delResult.success) {
-        return {message: `${tableGender} ${table} ${Object.values(dataEntry)[1]} wurde erfolgreich gelöscht!`, success: delResult.success, del: true};
-    }
+    //const delResult = await deleteData(data.del, dataId, tableName);
+    //if (delResult.success) {
+    //    return {message: `${tableGender} ${table} ${Object.values(dataEntry)[1]} wurde erfolgreich gelöscht!`, success: delResult.success, del: true};
+    //}
     console.log(`newDataID = ${newDataId}`);
     for (const column of dataColumns)  {
         await db.query(
-            `UPDATE ${tableName} SET ${column} = ? WHERE id = ?`,
+            `UPDATE ${tableName} SET ${column} = ? WHERE ${primaryKeyColumn} = ?`,
             [data[column], newDataId]
         );
     };
@@ -172,7 +164,7 @@ async function writeData(data, dataColumns, tableName, dataId) {
         newEntryResult.type = "bearbeitet";
     }
     let object;
-    if (tableName = "gameCards") object = ""; else object = Object.values(dataEntry)[1];
+    if (tableName === "gameCards") object = ""; else object = Object.values(dataEntry)[1];
     const message = `${tableGender} ${table} ${object} wurde erfolgreich ${newEntryResult.type}!`;
     return { message: message, success: newEntryResult.success, title: Object.values(dataEntry)[1], newDataId: newDataId };
 }
@@ -228,7 +220,6 @@ app.get("/gameCards", async (req, res) => {
         }
         gameCardList.push(gameCard);
     }
-    console.log(gameCardList);
     res.json(gameCardList);
 });
 
@@ -236,26 +227,75 @@ app.get("/players", async (req, res) => {
     const [players_data] = await db.query(
         "SELECT * FROM players"
     );
+
+    const [timeslots_data] = await db.query(
+        "SELECT * FROM timeslots"
+    );
+
+    const [game_preferences_data] = await db.query(
+        "SELECT * FROM game_preferences"
+    );
+
     playersList.length = 0;
     for (const player_entry of players_data) {
+        let timeslotsOfPlayer = timeslots_data.find(timeslot => timeslot.player_id === player_entry.id);
+        if (timeslotsOfPlayer) {
+            delete timeslotsOfPlayer.player_id;
+        } else {
+            timeslotsOfPlayer = {
+                slot_all: false,
+                slot_1: false,
+                slot_2: false,
+                slot_3: false,
+                slot_4: false,
+                slot_5: false,
+                slot_6: false,
+                slot_7: false,
+                slot_8: false
+            };
+        }
+        let gamePreferencesOfPlayer = game_preferences_data.find(gamePreference => gamePreference.player_id === player_entry.id);
+        if (gamePreferencesOfPlayer) {
+            delete gamePreferencesOfPlayer.player_id;
+        } else {
+            gamePreferencesOfPlayer = {
+                rank1: null,
+                rank2: null,
+                rank3: null,
+                rank4: null,
+                rank5: null,
+                rank6: null,
+                rank7: null,
+                rank8: null
+            };
+        }
+
         const player = new Player(
             player_entry.id,
             player_entry.firstName,
             player_entry.lastName,
-            [],
-            [],
-            player_entry.rank1,
-            player_entry.rank2,
-            player_entry.rank3,
-            player_entry.rank4,
-            player_entry.rank5,
-            player_entry.rank6,
-            player_entry.rank7,
-            player_entry.rank8
+            timeslotsOfPlayer,
+            {
+                email: player_entry.email,
+                mobile: player_entry.mobile,
+                overnightOptions: {
+                    stayOvernight: player_entry.stayOvernight,
+                    roomPreference: player_entry.roomPreference,
+                    bedLinenNeeded: player_entry.bedLinenNeeded,
+                },
+                modeOfTransportation: player_entry.modeOfTransportation,
+                specialFoodNeeds: {
+                    vegetarian: player_entry.vegetarian,
+                    otherFoodNeeds: player_entry.otherFoodNeeds,
+                    foodNeedsText: player_entry.foodNeedsText
+                },
+                joinWhatsApp: player_entry.joinWhatsApp,
+                agreeToJoin: player_entry.agreeToJoin
+            },
+            gamePreferencesOfPlayer
         );
         playersList.push(player);
     }
-    console.log(playersList[7]);
     res.json(playersList);
     
 });
@@ -356,12 +396,34 @@ app.get("/assess", (req, res) => {
 
 app.post("/players", async (req, res) => {
     console.log(req.body);
-    const { firstName, lastName, rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8, playerId, del } = req.body;
+    const { firstName, lastName, email, mobile, timeslots, stayOvernight, roomPreference, bedLinenNeeded,modeOfTransportation, vegetarian, otherFoodNeeds, foodNeedsText, joinWhatsApp, agreeToJoin, gamePreferences, playerId, del } = req.body;
     const playerColumns = Object.keys(req.body).filter(
-        key => !["playerId", "del"].includes(key)
+        key => !["playerId", "del", "timeslots", "gamePreferences"].includes(key)
     );
-    const result = await writeData(req.body, playerColumns, "players", req.body.playerId);
-    res.json(result);
+    for (const key in req.body) {
+        if (typeof req.body[key] === "boolean" && key !== "del") {
+            console.log("Boolean gefunden:", key);
+            req.body[key] = req.body[key] ? 1 : 0;
+        }
+    };
+    if (req.body.del) {
+        const delResult = await deleteData(req.body.del, req.body.playerId, "players", "id");
+        const delTimeslotsResult = await deleteData(req.body.del, req.body.playerId, "timeslots", "player_id");
+        const delGamePreferencesResult = await deleteData(req.body.del, req.body.playerId, "game_preferences", "player_id");
+        res.json(delResult, delTimeslotsResult, delGamePreferencesResult);
+    };
+
+    const playerResult = await writeData(req.body, playerColumns, "players", req.body.playerId, "id");
+    
+
+    const timeslotColumns = ["player_id", ...Object.keys(timeslots).map(key => `slot_${key}`)];
+    req.body.player_id = playerResult.newDataId;
+    const timeslotResult = await writeData(req.body, timeslotColumns, "timeslots", req.body.playerId, "player_id");
+
+    const gamePreferenceColumns = ["player_id", ...Object.keys(gamePreferences).map(key => `rank_${key}`)];
+    const gamePreferenceResult = await writeData(req.body, gamePreferenceColumns, "game_preferences", req.body.playerId, "player_id");
+
+    res.json(playerResult);
 });
 
 app.post("/games", async (req, res) => {
@@ -379,11 +441,14 @@ app.post("/games", async (req, res) => {
             );
         };
     };
-    const result = await writeData(req.body, gameColumns, "games", thisGameId);
-    console.log(result);
-    if (result.del) {
-        return res.json(result);
+
+    if (req.body.del) {
+        const delResult = await deleteData(req.body.del, req.body.gameId, "games", "id");
+        return res.json(delResult);
     }
+
+    const result = await writeData(req.body, gameColumns, "games", thisGameId, "id");
+    console.log(result);
     thisGameId = result.newDataId;
     let values = req.body.preferredPlayers.map(playerCount => [
         thisGameId,
@@ -415,7 +480,7 @@ app.post("/gameCards", async (req, res) => {
     );
     let thisGameId = req.body.dataId;
 
-    const result = await writeData(req.body, gameColumns, "gameCards", thisGameId);
+    const result = await writeData(req.body, gameColumns, "gameCards", thisGameId, "id");
     console.log(result);
     res.json(result);
 });
@@ -434,6 +499,10 @@ app.get("/admin/spieleranking", (req,res) => {
 
 app.get("/admin/nerdsweekplanung", (req,res) => {
     res.sendFile(path.join(__dirname, "../public/createPlan/createPlan.html"));
+});
+
+app.get("/join", (req,res) => {
+    res.sendFile(path.join(__dirname, "../public/join/join.html"));
 });
 
 app.listen(PORT, "0.0.0.0", () => {

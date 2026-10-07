@@ -13,11 +13,11 @@ img, video, iframe {
 }
 
 :root {
-    --primCol: #0a5753;
-    --primColLight: #7fc7c5;
+    --primCol: #4CBE9C;
+    --primColLight: #98dcc7;
     --primColLighter: #a0eadf;
-    --bgCol: #af6f79;
-    --bgColLight: #e2b1b5;
+    --bgCol: #905AEE;
+    --bgColLight: #b29bd9;
     font-family: "Type Light Sans";
 }
 
@@ -29,8 +29,11 @@ img, video, iframe {
 }
 
 button {
+    background-color: black;
     color: var(--primCol);
-    background-color: var(--bgCol);
+    border: 0.5rem solid var(--primCol);
+    box-sizing: border-box;
+    box-shadow: 0.25rem 0.25rem 0 var(--bgCol);
     font-family: "Type Light Sans";
     font-size: 20px;
     display: inline-flex;
@@ -62,7 +65,14 @@ button svg {
     /*margin: 10px 10px;
     /* font-family: "Unitblock";*/
     font-size: 20px;
-    
+    margin-bottom: 1rem;
+    margin-right: 1rem;
+}
+
+.standardForm {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem 0;
 }
 
 
@@ -109,7 +119,8 @@ select {
 table {
     width: 100%;
     border-collapse: collapse;
-    background-color: var(--primColLighter);
+    background-color: black;
+    color: var(--primCol);
 }
 
 th,
@@ -126,11 +137,11 @@ th {
 }
 
 tr:nth-child(even) {
-    background-color: var(--primColLight);
+    background-color: rgb(74, 73, 73);
 }
 
 tr:hover {
-    background-color: var(--bgColLight);
+    background-color: var(--bgCol);
 }
 
 table button {
@@ -138,32 +149,59 @@ table button {
 }
 
 .table-scroll {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
 }
 
 .table-scroll table {
-  min-width: 700px; /* je nach Inhalt */
-  border-collapse: collapse;
+    min-width: 700px; /* je nach Inhalt */
+    border-collapse: collapse;
 }
 
 .table-scroll::before {
-  content: "← Tabelle seitlich wischen →";
-  display: block;
-  padding: 0.5rem;
-  font-size: 0.85rem;
-  color: var(--primCol);
+    content: "← Tabelle seitlich wischen →";
+    display: block;
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--primCol);
 }
 
 input, select, textarea {
-    background-color: var(--bgColLight);
+    background-color: var(--primColLight);
     border-radius: 0;
 }
 
 input:read-only,
 textarea:read-only {
     background-color: #b3a5a6;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    accent-color: var(--primCol);
+    appearance: none;
+    width: 1.2rem;
+    height: 1.2rem;
+    margin: 0;
+    border: 2px solid var(--primCol);
+    background: transparent;
+    cursor: pointer;
+}
+
+input[type="radio"] {
+    border-radius: 50%;
+}
+
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+    background: var(--primCol);
+}
+
+/* Sichtbarer Fokus bei Bedienung mit der Tastatur */
+input:focus-visible {
+    outline: 2px solid var(--bgColLight);
+    outline-offset: 3px;
 }
 
 .inner-edge {

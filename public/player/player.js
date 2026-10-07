@@ -3,7 +3,7 @@ import {
     createButton,
     generateTableBody,
     generateTableHead,
-    createFieldsForPlayer,
+    createFieldsForPlayers,
     addDataToDatabaseButton,
     createAndShowBackButton,
     createGamesOptions
@@ -23,6 +23,7 @@ from "../shared/data_management.js";
 let players = [];
 let games = [];
 let fields = [];
+let fieldsForTable = [];
 let fieldsWithoutID = [];
 
 const containerID = "formContainer";
@@ -37,21 +38,20 @@ const playersTableButtons = [
 ]
 
 function generatePlayersTableBody() {
-    generateTableBody("playersTableBody", "players", playersTableButtons, fields, true);
+    generateTableBody("playersTableBody", "players", playersTableButtons, fieldsForTable, true);
 }
 
-
-
-
-
 async function start() {
-    fields = createFieldsForPlayer();
+    fields = await createFieldsForPlayers("all")
+    fieldsForTable = fields.filter(
+        field => !["fieldset", "legend"].includes(field.element)
+    );
     fieldsWithoutID = fields.slice(1);
     await refreshValues("games");
     games = await getValues("games");
     await refreshValues("players");
     players = await getValues("players");
-    generateTableHead("playersTableHead", fields);
+    generateTableHead("playersTableHead", fieldsForTable);
     generatePlayersTableBody();
     const backButton = createAndShowBackButton("/admin", "playerButtons");
     const addPlayerButton = createButton("addPlayerButton", addSvg, "image", "roundButton", () => {

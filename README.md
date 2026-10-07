@@ -6,7 +6,9 @@ Diese Webapp dient dazu, das mehrtägige Brettspielevent Nerdsweek besser zu org
 ## Funktionen
 
 ### Anmeldung von Teilnehmenden zur Nerdsweek
-Diejenigen, die an der nächsten Nerdsweek teilnehmen möchten, können sich über einen Klick auf den großen Nerdsweek-Banner-Button anmelden. Anschließend wird ein Formular angezeigt, in dem sie ihren Namen und ihre Spielpräferenzen angeben können.
+Wer an der nächsten Nerdsweek teilnehmen möchte, kann sich über einen Klick auf den Button "Join" anmelden. Anschließend wird ein Formular angezeigt, in dem Name, relevante Information und Spielpräferenzen angegeben werden können. Während des gesamten Anmeldeprozesses wird der User von dem Nerdsweek-Maskottchen "Nerdy" begleitet.
+
+![Anmeldung: Auswahl der Spielepräferenzen mittels Ranking von 1-8](/images/Auswahl_Spielepraeferenzen.png)
 
 ### Verwaltung der Nerdsweek über den Adminbereich
 Der Adminbereich ist nur mit passenden Zugangsdaten zu erreichen. Derzeit besteht ein Admin-Nutzerkonto.
@@ -14,16 +16,17 @@ Der Adminbereich ist nur mit passenden Zugangsdaten zu erreichen. Derzeit besteh
 Folgende Funktionen sind bereits implementiert:
 - Verwaltung und Bearbeitung der Spieledatenbank
 - Verwaltung und Bearbeitung der Teilnehmerliste
-- Einsicht in Spielerpräferenzen und das daraus resultierendes Spieleranking
-- Erste Implementierung eines Planungsalgorithmus, der durch viele Durchläufe den besten Plan mit den derzeit gegebenen Einstellungen findet und Unstimmigkeiten feststellt
+- Einsicht in Spielerpräferenzen und das daraus resultierende Spieleranking
+- Nutzung eines Planungsalgorithmus, der durch viele Durchläufe den besten Plan mit den derzeit gegebenen Einstellungen findet und Unstimmigkeiten feststellt
 
-![Admin-Bereich](/images/Adminbereich_Nerdsweek.png)
+![Admin-Bereich](/images/Adminbereich.png)
 
 ## Tech-Stack
 - Frontend:
     - HTML
     - CSS
     - JavaScript
+    - Rive
     - DOM API
 - Backend:
     - Node.js
@@ -39,6 +42,7 @@ Folgende Funktionen sind bereits implementiert:
 - **Wiederverwendbare Komponenten:** Formulare und Tabellen werden durch allgemeine Funktionen erzeugt und für verschiedene Datenarten (z. B. Spiele und Teilnehmer) wiederverwendet.
 - **Zentrale Datenverwaltung:** Gemeinsam genutzte Daten werden über ein zentrales Modul verwaltet, um Redundanzen zu vermeiden.
 - **Asynchrone Datenbankzugriffe:** Die Kommunikation mit der Datenbank erfolgt über async/await.
+
 ## Lokal starten
 
 ### Voraussetzungen
@@ -48,7 +52,7 @@ Folgende Funktionen sind bereits implementiert:
 ### Installation
 1. Repository klonen
 2. Abhängigkeiten installieren
-```npm install```
+`npm install`
 3. eine MySQL-Datenbank anlegen
 4. eine `.env`-Datei im Projektverzeichnis erstellen
 
@@ -57,33 +61,33 @@ Folgende Funktionen sind bereits implementiert:
 DB_HOST=localhost
 DB_USER=[deinen Nutzernamen hier eingeben]
 DB_PASSWORD=[dein Passwort hier festlegen]
-DB_NAME=[deinen Datenbank-Namen hier hinterlegen]```
+DB_NAME=[deinen Datenbank-Namen hier hinterlegen]
+```
 
 ### Projekt starten
 Starte im Projektverzeichnis folgenden Befehl:
 
-```npm run dev```
+`npm run dev`
 
 
-Die benötigten MySQL-Tabellen müssen derzeit manuell erstellt werden. Eine kleine Hilfestellung dafür befindet sich in der Datei createTables.js im Projektverzeichnis. Welche Tabellen und Spalten aktuell benötigt werden, lässt sich insbesondere dem Code in /server/index.js entnehmen.
+Die benötigten MySQL-Tabellen müssen derzeit manuell erstellt werden. Eine kleine Hilfestellung dafür befindet sich in der Datei createTables.js im Ordner /scripts. Welche Tabellen und Spalten aktuell benötigt werden, lässt sich insbesondere dem Code in /server/index.js entnehmen.
 
 ## Ausblick
 
 ### Geplante nächste Schritte
-- Ausbau und Verbesserung des Planungsalgorithmus
-– visuelle Darstellung des erstellten Plans
-- Ausbau des Anmeldebereichs um weitere Formularfelder wie E-Mail-Adresse, Zimmerwünsche usw.
-- weitere Gestaltung der Seite mit CSS
+- Speicherung der Spielepräferenzen in der Datenbank
+- Erweiterung des Planungsalgorithmus um weitere Parameter
+- visuelle Darstellung des erstellten Plans
 - Personalisierte Links, über die Teilnehmende ihre Anmeldung bearbeiten können
 
 ### Mittelfristige Ziele
 - Suchfunktion für die einzelnen Tabellen
-– manuelle Anpassbarkeit des Plans via Drag-and-Drop
-- Umgestaltung der Anmeldeseite, sodass Spiele über Kacheln anwählbar sind
+- manuelle Anpassbarkeit des Plans via Drag-and-Drop
 - Verbesserung der Fehlerhandhabung
 - Implementierung eines Rollen- und Rechtemanagement
 - Verbesserung der Datensicherheit
-– Optisch ansprechende individuelle Gestaltung der Website
+- weitere Gestaltung von Animationen
+- Ausbau der Individualität des optischen Erscheinungsbilds
 
 ### Langfristige Ideen
 - Möglichkeit der Personalisierung des Anmeldebereichs über den Adminbereich

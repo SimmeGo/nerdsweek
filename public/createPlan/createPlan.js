@@ -16,6 +16,8 @@ let nextPlayId = 1;
 let plays = [];
 let games = [];
 let players = [];
+let timeslots = [];
+
 let ratings = [];
 let gamesRating = {};
 let chosenGames = {};
@@ -28,10 +30,9 @@ const RANKS = TIMESLOTS;
 const containerId = "formContainer";
 const fields = [
     {
-        element: "input",
+        element: "number",
         label: "Anzahl an Durchläufen",
         name: "cycleCount",
-        type: "number"
     }
 ]
 
@@ -66,7 +67,6 @@ class Play {
     }
 }
 
-let timeslots = []
 
 
 
@@ -700,16 +700,16 @@ function analysePlan(currentPlan, bestPlan, i) {
 }
 
 function comparePlans(oldPlan, newPlan) {
-    if (oldPlan.averageSatisfaction > newPlan.averageSatisfaction) return false;
     let comparisonScore = 0;
     for (const [playerId, satisfactionScore] of Object.entries(oldPlan.playerSatisfaction)) {
         const thisPlayersNewSatisfaction = newPlan.playerSatisfaction[playerId];
         if (thisPlayersNewSatisfaction >= satisfactionScore) comparisonScore += 1;
     }
+    if (/*comparisonScore/Object.values(oldPlan.playerSatisfaction).length >= 0.5 && */Math.min(...Object.values(newPlan.playerSatisfaction)) <= Math.min(...Object.values(oldPlan.playerSatisfaction))) return false;
     console.log(`Insgesamt haben ${comparisonScore} Spieler bei diesem Plan einen besseren Zufriedenheitswert.`);
-    if (comparisonScore/Object.values(oldPlan.playerSatisfaction).length >= 0.5 && Math.min(...Object.values(newPlan.playerSatisfaction)) >= Math.min(...Object.values(oldPlan.playerSatisfaction))) return true;
-
-    return false;
+    //if (oldPlan.averageSatisfaction < newPlan.averageSatisfaction) return true;
+    
+    return true;
 }
 
 function reportInbetweenResult(bestPlan, i) {
@@ -753,7 +753,7 @@ function displayResults(bestPlan) {
     for (let i = 1; i <= 8; i++) {
         
         const playsInTimeslot = bestPlan.plays.filter(play => play.timeslot?.includes(i));
-        text.push(`Im ${i}. Zeitslot, am ${timeslots[i-1].date} um ${timeslots[i-1].date} finden folgende Partien statt:`)
+        text.push(`Im ${i}. Zeitslot, am ${timeslots[i-1].date} um ${timeslots[i-1].startTime} finden folgende Partien statt:`)
         playsInTimeslot.forEach(play => {
             const playerNames = [];
             const thisGame = games.find(game => game.id === play.playedGame);
@@ -834,10 +834,13 @@ async function start() {
     games = await getValues("games");
     await refreshValues("players");
     players = await getValues("players");
+    await refreshValues("timeslots");
+    timeslots = await getValues("timeslots");
+
+
     ratings = calculateRatings(games, players);
     gamesRating = ratings[0];
     chosenGames = ratings[1];
-    createTimeslots();
     generateForm(fields, containerId);
     const startAlgorithmButton = createButton("startAlgorithm", "Starte Algorithmus", "text", "", () => {startAlgorithm()});
     document.getElementById(containerId).appendChild(startAlgorithmButton);

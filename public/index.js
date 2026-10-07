@@ -42,7 +42,7 @@ function updateLayout(width) {
     const canvas = document.getElementById("nerdyCanvas");
     const isMobile = width < 700;
 
-    if (width > 1000) width = 1000;
+    if (width > 1000) width = 900;
 
     const artboardWidth = isMobile
         ? smallArtboardWidth
@@ -99,6 +99,15 @@ function loadNerdy() {
         }),
         onLoad: () => {
             console.log(nerdy.contents?.artboards);
+            const menuInstance = nerdy.viewModelInstance;
+            const joinClicked = menuInstance.trigger("leftClicked");
+            const nerdsClicked = menuInstance.trigger("middleClicked");
+            const infoClicked = menuInstance.trigger("rightClicked");
+
+            joinClicked.on(() => window.location.href = "/join");
+            //nerdsClicked.on(() => window.location.href = "/nerds");
+            //infoClicked.on(() => window.location.href = "/info");
+
             addResizeListener();
             //const width = Math.round(entry.contentRect.width);
             //updateLayout(width);

@@ -1,5 +1,7 @@
 import { generateForm, createButton } from "/shared/forms.js";
 
+const TIMESLOTS = [1, 2, 3, 4, 5, 6, 7, 8];
+
 class Timeslot {
 
     constructor(id, date, startTime, playCount) {
@@ -32,13 +34,11 @@ export async function refreshValues(dataType) {
 async function loadValues(dataType) {
     if (dataType === "timeslots") return createTimeslots();
     const response = await fetch(`/${dataType}`, {cache: "no-store"});
-    console.log(response.json);
     return await response.json();
 }
 
 export function translateValues(values) {
     let translatedValues = [];
-    console.log(values);
     values.forEach(player => {
         let newPlayer = {};
         for (const [key, value] of Object.entries(player)) {
@@ -53,11 +53,9 @@ export function translateValues(values) {
             } else {
                 textContent = value;
             };
-            console.log(textContent);
             newPlayer[key] = textContent; 
         };
         translatedValues.push(newPlayer);
-        console.log(newPlayer);
     });
     return translatedValues;
 }
@@ -65,7 +63,6 @@ export function translateValues(values) {
 export async function addDataToDatabase(dataId, fields, sendFunction, containerID, join) {
     const formContainer = document.getElementById(containerID);
     const values = checkDataBeforeServer(fields, containerID);
-    console.log(values);
     if ( values === null ) {
         return;
     }
@@ -80,18 +77,18 @@ export async function addDataToDatabase(dataId, fields, sendFunction, containerI
 }
 
 export function editDataInDatabase(containerID, dataId, fields, data, multipleFunction, sendFunction, tableFunction, optionalFunction) {
-    generateForm(fields, containerID, optionalFunction);
+    const form = generateForm(fields, containerID, optionalFunction);
+    form.className = "standardForm";
     if (optionalFunction) {
         optionalFunction();
     }
     const formContainer = document.getElementById(containerID);
     const dataEntry = data.find(dataEntry => dataEntry.id === dataId);
 
-    fillInputElements(fields, data, dataId);
+    fillInputElements(fields, data, dataId, multipleFunction);
     
     const saveChangesButton = createButton("saveChangesButton", "Speichern", "text", "", async () => {
         const values = checkDataBeforeServer(fields, containerID);
-        console.log(values);
         const result = await sendFunction(values, dataId, false);
         formContainer.innerHTML = result.message;
         tableFunction();
@@ -103,7 +100,7 @@ export function editDataInDatabase(containerID, dataId, fields, data, multipleFu
     formContainer.appendChild(saveChangesButton);
 }
 
-export function fillInputElements(fields, data, dataId) {
+export function fillInputElements(fields, data, dataId, multipleFunction) {
     const dataEntry = data.find(dataEntry => dataEntry.id === dataId);
     if (!dataEntry) return;
     fields.forEach(element => {
@@ -121,7 +118,6 @@ export function fillInputElements(fields, data, dataId) {
 }
 
 export async function deleteDataFromDatabase(data, dataId, tableFunction, sendFunction) {
-    console.log(data);
     const dataEntry = data.find(dataEntry => dataEntry.id === dataId);
     const message = confirm(`Möchtest du ${Object.values(dataEntry)[1]} wirklich löschen?`);
     if (message) {
@@ -133,7 +129,7 @@ export async function deleteDataFromDatabase(data, dataId, tableFunction, sendFu
     }
 }
 
-export async function sendPlayerToServer(player_data, playerId, del) {
+export async function sendPlayerToServerOld(player_data, playerId, del) {
     const response = await fetch("/players", {
         method: "POST",
         headers: {
@@ -157,11 +153,41 @@ export async function sendPlayerToServer(player_data, playerId, del) {
     return await response.json();
 }
 
+export async function sendPlayerToServer(userData, playerId, del) {
+    const response = await fetch("/players", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            email: userData.email,
+            mobile: userData.mobile,
+            timeslots: userData.timeslots,
+            stayOvernight: userData.stayOvernight,
+            roomPreference: userData.roomPreference,
+            bedLinenNeeded: userData.bedLinenNeeded,
+            modeOfTransportation: userData.modeOfTransportation,  
+            vegetarian: userData.vegetarian,
+            otherFoodNeeds: userData.otherFoodNeeds,
+            foodNeedsText: userData.foodNeedsText,
+            joinWhatsApp: userData.joinWhatsApp,
+            agreeToJoin: userData.agreeToJoin,
+            gamePreferences: userData.gamePreferences,
+            playerId: playerId,
+            del: del
+        })
+    });
+    return await response.json();
+}
+
 export function getValuesfromForm(fields) {
     let values = [];
     for (const field of fields) {
-        const content = document.getElementById(field.name).value;
-        console.log(`Der Wert von ${field.name} ist ${document.getElementById(field.name).value}.`);
+        const element = document.getElementById(field.name);
+        if (!element) continue;
+        const content = element.value;
         if ( content === "" || content === "-1" ) {
             if ( field.mandatory ) {
                 console.log(`${field.name} ist ein Pflichtfeld!`)
