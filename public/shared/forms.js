@@ -207,7 +207,7 @@ export async function createFieldsForPlayers(part) {
         ["other", createFieldsForOther],
         ["ranking", createRankFields],
         ["all", createAllFields]
-    ])
+    ]);
 
     return await parts.get(part)();
 }
@@ -219,7 +219,7 @@ function createFieldsForPersonalData() {
             element: "text",
             name: "firstName",
             label: "Vorname",
-            get: player => player.firstName,
+            get: player => player.firstName, set: (player, value) => { player.firstName = value; },
             mandatory: true
         },
         {
@@ -227,7 +227,7 @@ function createFieldsForPersonalData() {
             element: "text",
             name: "lastName",
             label: "Nachname",
-            get: player => player.lastName,
+            get: player => player.lastName, set: (player, value) => { player.lastName = value; },
             mandatory: true
         },
         {
@@ -235,7 +235,7 @@ function createFieldsForPersonalData() {
             element: "text",
             name: "email",
             label: "E-Mail-Adresse",
-            get: player => player.data.email,
+            get: player => player.data.email, set: (player, value) => { player.data.email = value; },
             mandatory: true
         },
         {
@@ -243,32 +243,86 @@ function createFieldsForPersonalData() {
             element: "text",
             name: "mobile",
             label: "Mobil",
-            get: player => player.data.mobile,
+            get: player => player.data.mobile, set: (player, value) => { player.data.mobile = value; },
             mandatory: true
         },
     ];
 }
 
-export async function createFieldsForLogistics() {
+async function createFieldsForLogistics() {
     await refreshValues("timeslots");
     const timeslots = await getValues("timeslots");
     let fields = [
-        { element: "fieldset", name: "attendance"},
-        { element: "legend", label: "Wann nimmst du an der Nerdsweek teil?"},
-        { element: "checkbox", name: "timeslots", class: "completeNerdsweek", label: "Ich nehme an der gesamten Nerdsweek teil.", fieldset: "attendance", value: "all", get: player => player.availableTimeslots.slot_all},
+        { 
+            element: "fieldset",
+            name: "attendance"
+        },
+        {
+            element: "legend",
+            label: "Wann nimmst du an der Nerdsweek teil?"
+        },
+        {
+            element: "checkbox",
+            name: "timeslots",
+            class: "completeNerdsweek",
+            label: "Ich nehme an der gesamten Nerdsweek teil.",
+            fieldset: "attendance",
+            value: "all",
+            get: player => player.timeslots.slot_all,
+            set: (player, value) => { player.timeslots.slot_all = value; }
+        },
     ];
-    let date = timeslots[0].date;
-    let rowNumber = 1;
-    for (let i = 1; i <= 8; i++) {
-        //rowNumber = timeslots[i-1].date === date ? rowNumber : rowNumber + 1;
-        fields.push({ element: "checkbox", name: "timeslots", label: `Zeitslot ${i}, \u200B${timeslots[i-1].date} ${timeslots[i-1].startTime}`, fieldset: "attendance", value: `${i}`, get: player => player.availableTimeslots[`slot_${i}`]});    
-    };
+    timeslots.forEach((timeslot, index) => {
+        fields.push({
+            element: "checkbox",
+            name: "timeslots",
+            label: `Zeitslot ${index + 1}, \u200B${timeslot.date} ${timeslot.startTime}`,
+            fieldset: "attendance",
+            value: `${index + 1}`,
+            get: player => player.timeslots[`slot_${index + 1}`],
+            set: (player, value) => { player.timeslots[`slot_${index + 1}`] = value; }
+        });
+    });
     fields.push(
-        { element: "fieldset", name: "stay"},
-        { element: "radio", name: "stayOvernight", legend: "Ich übernachte im \"Haus der Stille\".", labels: [["Ja", true], ["Nein", false]], fieldset: "stay", get: player => player.data.overnightOptions.stayOvernight, mandatory: true},
-        { element: "select", name: "roomPreference", label: "Zimmerwunsch", class: "double-width", fieldset: "stay", get: player => player.data.overnightOptions.roomPreference, options: ["Matratzenlager", "Zelt", "Einzelzimmer", "Doppelzimmer"], mandatory: true},
-        { element: "fieldset", name: "bedLinen"},
-        { element: "radio", name: "bedLinenNeeded", legend: "Ich möchte Bettwäsche ausleihen", labels: [["Ja (+ ca. 7,50€)", true], ["Nein", false]], fieldset: "bedLinen", get: player => player.data.overnightOptions.bedLinenNeeded, mandatory: true},
+        {
+            element: "fieldset",
+            name: "stay"
+        },
+        {
+            element: "radio",
+            name: "stayOvernight",
+            legend: "Ich übernachte im \"Haus der Stille\".",
+            labels: [["Ja", "true"], ["Nein", "false"]],
+            fieldset: "stay",
+            get: player => player.data.overnightOptions.stayOvernight,
+            set: (player, value) => { player.data.overnightOptions.stayOvernight = value; },
+            mandatory: true
+        },
+        {
+            element: "select",
+            name: "roomPreference",
+            label: "Zimmerwunsch",
+            class: "double-width",
+            fieldset: "stay",
+            get: player => player.data.overnightOptions.roomPreference,
+            set: (player, value) => { player.data.overnightOptions.roomPreference = value; },
+            options: ["Matratzenlager", "Zelt", "Einzelzimmer", "Doppelzimmer"],
+            mandatory: true
+        },
+        {
+            element: "fieldset",
+            name: "bedLinen"
+        },
+        {
+            element: "radio",
+            name: "bedLinenNeeded",
+            legend: "Ich möchte Bettwäsche ausleihen",
+            labels: [["Ja (+ ca. 7,50€)", "true"], ["Nein", "false"]],
+            fieldset: "bedLinen",
+            get: player => player.data.overnightOptions.bedLinenNeeded,
+            set: (player, value) => { player.data.overnightOptions.bedLinenNeeded = value; },
+            mandatory: true
+        },
     )
     return fields;
 }
@@ -286,7 +340,7 @@ function createFieldsForOther() {
             name: "modeOfTransportation",
             labels: [["eigener PKW", "ownCar"], ["(selbst organisierte) Mitfahrgelegenheit", "rideShare"], ["Zug", "train"]],
             fieldset: "transportation",
-            get: player => player.data.modeOfTransportation,
+            get: player => player.data.modeOfTransportation, set: (player, value) => { player.data.modeOfTransportation = value; },
             mandatory: true
         },
         {
@@ -305,7 +359,8 @@ function createFieldsForOther() {
             label: "Ich esse vegetarisch.",
             fieldset: "foodNeeds",
             value: "vegetarian",
-            get: player => player.data.specialFoodNeeds.vegetarian
+            get: player => player.data.specialFoodNeeds.vegetarian,
+            set: (player, value) => { player.data.specialFoodNeeds.vegetarian = value; }
         },
         { 
             element: "checkbox",
@@ -313,14 +368,16 @@ function createFieldsForOther() {
             label: "Ich habe folgende Allergien/\u200BUnverträglichkeiten:",
             fieldset: "foodNeeds",
             value: "otherFoodNeeds",
-            get: player => player.data.specialFoodNeeds.other
+            get: player => player.data.specialFoodNeeds.other,
+            set: (player, value) => { player.data.specialFoodNeeds.other = value; }
         },
         { 
             element: "text",
             name: "foodNeedsText",
             label: "",
             fieldset: "foodNeeds",
-            get: player => player.data.specialFoodNeeds.text
+            get: player => player.data.specialFoodNeeds.text,
+            set: (player, value) => { player.data.specialFoodNeeds.text = value; }
         },
 
         {
@@ -334,7 +391,8 @@ function createFieldsForOther() {
             name: "joinWhatsApp",
             labels: [["Ich bin bereits Teil der Gruppe.", "alreadyIn"], ["Ja, ich möchte sehr gern hinzugefügt werden.", "yes"], ["Nein, ich möchte nicht hinzugefügt werden.", "no"]],
             fieldset: "whatsApp",
-            get: player => player.data.joinWhatsApp,
+            get: player => player.data.joinWhatsApp, 
+            set: (player, value) => { player.data.joinWhatsApp = value; },
             mandatory: true
         },
 
@@ -343,21 +401,31 @@ function createFieldsForOther() {
             name: "agreeToJoin",
             label: "Hiermit bestätige ich meine Anmeldung bei der Nerdsweek 2027.",
             value: "agreeToJoin",
-            get: player => player.data.agreeToJoin,
+            get: player => player.data.agreeToJoin, 
+            set: (player, value) => { player.data.agreeToJoin = value; },
             mandatory: true
         },
     ];
 }
 
-export function createRankFields() {
+function createRankFields() {
     let fields = [];
     for (let i = 1; i <= 8; i++) {
-        fields.push({ element: "select", type: "text", name: `rank${i}`, label: `Rang ${i}`, get: player => player["rank" + i], options: "", mandatory: true });    
+        fields.push({
+            element: "select",
+            type: "text",
+            name: `rank_${i}`,
+            label: `Rang ${i}`,
+            get: player => player["rank_" + i],
+            set: (player, value) => { player["rank_" + i] = value; },
+            options: "",
+            mandatory: true
+        });
     }
     return fields;
 }
 
-export async function createAllFields() {
+async function createAllFields() {
     const id = {
         name: "id",
         label: "ID",
@@ -368,6 +436,50 @@ export async function createAllFields() {
     const otherFields = createFieldsForOther();
     const rankFields = createRankFields();
     return [id, ...personalDataFields, ...logisticsFields, ...otherFields];
+}
+
+export function insertUserData(fields, userData) {
+    fields.forEach(field => {
+        if (typeof field.get !== "function") {
+            return;
+        } else if (field.get(userData) === null) return;
+        if (field.name === "timeslots") {
+            document.querySelector(`input[name="timeslots"][value="${field.value}"]`).checked = field.get(userData);
+        } else if (["checkbox"].includes(field.element) && field.name !== "timeslots") {
+            document.querySelector(`input[value="${field.value}"]`).checked = field.get(userData);
+        } else if (["radio"].includes(field.element)) {
+            document.querySelector(`input[name="${field.name}"][value=${field.get(userData)}]`).checked = true;
+        } else {
+            document.getElementById(field.name).value = field.get(userData);
+        };
+    });
+}
+
+export function saveUserData(fields, player) {
+    const userData = player;
+    fields.forEach(field => {
+        if (typeof field.set !== "function") {
+            console.log("Meine Funktion funktioniert nicht.");
+            return;
+        }
+        if (field.name === "timeslots") {
+            const checkbox = document.querySelector(`input[name="timeslots"][value="${field.value}"]`);
+            field.set(userData, checkbox.checked);
+        } else if (["checkbox"].includes(field.element) && field.name !== "timeslots") {
+            const checkbox = document.querySelector(`input[value="${field.value}"]`);
+            field.set(userData, checkbox.checked)
+        } else if (["radio"].includes(field.element)) {
+            const value = document.querySelector(`input[name=${field.name}]:checked`)?.value;
+            field.set(userData, value === "true" ? true
+                                    : value === "false" ? false
+                                    : value);
+        } else {
+            const input = document.getElementById(field.name);
+            field.set(userData, input.value);
+        };
+    });
+
+    return userData;
 }
 
 export async function createGamesOptions(fields) {

@@ -1,4 +1,4 @@
-import { generateForm, createButton } from "/shared/forms.js";
+import { generateForm, createButton, insertUserData, saveUserData } from "/shared/forms.js";
 
 const TIMESLOTS = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -20,7 +20,8 @@ let dataStore = {
     games: [],
     gameCards: [],
     players: [],
-    timeslots: []
+    timeslots: [],
+    emptyPlayer: {}
 };
 
 export function getValues(dataType) {
@@ -88,7 +89,7 @@ export function editDataInDatabase(containerID, dataId, fields, data, multipleFu
     fillInputElements(fields, data, dataId, multipleFunction);
     
     const saveChangesButton = createButton("saveChangesButton", "Speichern", "text", "", async () => {
-        const values = checkDataBeforeServer(fields, containerID);
+        const values = saveUserData(fields, dataEntry);//checkDataBeforeServer(fields, containerID);
         const result = await sendFunction(values, dataId, false);
         formContainer.innerHTML = result.message;
         tableFunction();
@@ -102,9 +103,22 @@ export function editDataInDatabase(containerID, dataId, fields, data, multipleFu
 
 export function fillInputElements(fields, data, dataId, multipleFunction) {
     const dataEntry = data.find(dataEntry => dataEntry.id === dataId);
+    const inputType = new Map([
+        []
+    ])
+
     if (!dataEntry) return;
-    fields.forEach(element => {
-        const input = document.getElementById(element.name);
+    const formFields = fields.filter(
+        field => !["fieldset", "legend"].includes(field.element)
+    );
+
+    insertUserData(formFields, dataEntry);
+
+    /*fields.forEach(element => {
+        if (typeof element.get !== "function") {
+            console.error("Feld ohne gültige get-Funktion:", element);
+            return;
+        }
         if (element.multiple) {
             multipleFunction(element.name);
             const select = document.getElementById(element.name)
@@ -112,9 +126,18 @@ export function fillInputElements(fields, data, dataId, multipleFunction) {
                 option.selected = element.get(dataEntry).includes(Number(option.value));
             }
         } else {
-        input.value = element.get(dataEntry);
+            const input = document.querySelector(`input[name="${element.name}"][value="${element.value}"]`);
+            console.log(element.name, element.value, input, "data:", element.get(dataEntry));
+            if (["checkbox"].includes(element.element)) {
+                input.checked = element.get(dataEntry);
+            } else if (["radio"].includes(element.element)) {
+                input.checked = true;
+            } else {
+                document.getElementById(element.name).value = element.get(dataEntry);
+            };
+            //input.value = element.get(dataEntry) ?? "";
         };
-    });
+    });*/
 }
 
 export async function deleteDataFromDatabase(data, dataId, tableFunction, sendFunction) {
@@ -123,8 +146,8 @@ export async function deleteDataFromDatabase(data, dataId, tableFunction, sendFu
     if (message) {
         const result = await sendFunction([], dataId, true);
         if (result.success) {
-            alert(result.message);
-        }
+            alert(`Der Spieler ${Object.values(dataEntry)[1]} wurde erfolgreich aus der Datenbank gelöscht!`);
+        };
         tableFunction();
     }
 }
@@ -154,29 +177,44 @@ export async function sendPlayerToServerOld(player_data, playerId, del) {
 }
 
 export async function sendPlayerToServer(userData, playerId, del) {
+    console.log(userData.timeslots);
+
+    console.log(userData.gamePreferences);
+
+    let userDataForServer = {};
+    let otherData = {
+        playerId: playerId,
+        del: del
+    };
+
+    if (!del) {
+        userDataForServer = {
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            email: userData.data.email,
+            mobile: userData.data.mobile,
+            timeslots: userData.timeslots,
+            stayOvernight: userData.data.overnightOptions.stayOvernight,
+            roomPreference: userData.data.overnightOptions.roomPreference,
+            bedLinenNeeded: userData.data.overnightOptions.bedLinenNeeded,
+            modeOfTransportation: userData.data.modeOfTransportation,  
+            vegetarian: userData.data.specialFoodNeeds.vegetarian,
+            otherFoodNeeds: userData.data.specialFoodNeeds.otherFoodNeeds,
+            foodNeedsText: userData.data.specialFoodNeeds.foodNeedsText,
+            joinWhatsApp: userData.data.joinWhatsApp,
+            agreeToJoin: userData.data.agreeToJoin,
+            gamePreferences: userData.gamePreferences,
+        };
+    };
+
     const response = await fetch("/players", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-            email: userData.email,
-            mobile: userData.mobile,
-            timeslots: userData.timeslots,
-            stayOvernight: userData.stayOvernight,
-            roomPreference: userData.roomPreference,
-            bedLinenNeeded: userData.bedLinenNeeded,
-            modeOfTransportation: userData.modeOfTransportation,  
-            vegetarian: userData.vegetarian,
-            otherFoodNeeds: userData.otherFoodNeeds,
-            foodNeedsText: userData.foodNeedsText,
-            joinWhatsApp: userData.joinWhatsApp,
-            agreeToJoin: userData.agreeToJoin,
-            gamePreferences: userData.gamePreferences,
-            playerId: playerId,
-            del: del
+            ... userDataForServer,
+            ... otherData
         })
     });
     return await response.json();

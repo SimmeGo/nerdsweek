@@ -67,7 +67,7 @@ class Player {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.availableTimeslots = availableTimeslots;
+        this.timeslots = availableTimeslots;
         this.data = data;
         this.gamePreferences = gamePreferences;
         
@@ -116,7 +116,6 @@ async function createDataEntry(dataId, tableName, firstKey, firstObject) {
             dataId: newDataId,
             message: message,
             success: true,
-            type: "erstellt"
         };
         return returnResult;
     }
@@ -124,49 +123,38 @@ async function createDataEntry(dataId, tableName, firstKey, firstObject) {
 }
 
 async function writeData(data, dataColumns, tableName, dataId, primaryKeyColumn) {
-    let rows;
-    let table;
-    let tableGender;
+    let action = "";
+    const dataType = new Map([
+        ["players", ["Der Teilnehmer", data.firstName]],
+        ["games", ["Das Spiel", data.title]],
+        ["gameCards", ["Die Kachel des Spiels", ""]]
+    ]);
+
     console.log("Wir sind im Durchlauf", tableName);
-    if (tableName === "games" || tableName === "gameCards") {
-        table = "Spiel";
-        tableGender = "Das"
-    } else if (tableName === "players") {
-        table = "Spieler";
-        tableGender = "Der";
-    };
+    
     console.log(dataColumns[0], data[dataColumns[0]]);
     const newEntryResult = await createDataEntry(dataId, tableName, dataColumns[0], data[dataColumns[0]]);
     let newDataId;
     console.log("Das Result ist", newEntryResult);
-    if (newEntryResult.success === true) {
+    if (newEntryResult.success) {
         newDataId = newEntryResult.dataId;
+        action = "erstellt";
     } else {
         newDataId = dataId;
+        action = "bearbeitet";
     };
-    [rows] = await db.query(
-            `SELECT * FROM ${tableName} WHERE ${primaryKeyColumn} = ?`,
-            [newDataId]
-    );
-    const dataEntry = rows[0];
-    //const delResult = await deleteData(data.del, dataId, tableName);
-    //if (delResult.success) {
-    //    return {message: `${tableGender} ${table} ${Object.values(dataEntry)[1]} wurde erfolgreich gelöscht!`, success: delResult.success, del: true};
-    //}
-    console.log(`newDataID = ${newDataId}`);
+
+    console.log(`newDataID = ${newDataId}`, dataColumns);
+
     for (const column of dataColumns)  {
         await db.query(
             `UPDATE ${tableName} SET ${column} = ? WHERE ${primaryKeyColumn} = ?`,
             [data[column], newDataId]
         );
     };
-    if (!newEntryResult.type) {
-        newEntryResult.type = "bearbeitet";
-    }
-    let object;
-    if (tableName === "gameCards") object = ""; else object = Object.values(dataEntry)[1];
-    const message = `${tableGender} ${table} ${object} wurde erfolgreich ${newEntryResult.type}!`;
-    return { message: message, success: newEntryResult.success, title: Object.values(dataEntry)[1], newDataId: newDataId };
+    if (!dataType.get(tableName)) return {success: true};
+    const message = `${dataType.get(tableName)[0]} ${dataType.get(tableName)[1]} wurde erfolgreich ${action}!`;
+    return { message: message, success: true, title: dataType.get(tableName)[1], newDataId: newDataId };
 }
 
 app.use("/admin", requireAdmin);
@@ -223,24 +211,92 @@ app.get("/gameCards", async (req, res) => {
     res.json(gameCardList);
 });
 
+app.get("/emptyPlayer", async (req, res) => {
+    const emptyPlayer = new Player(
+        0,
+        "",
+        "",
+        {
+            slot_all: false,
+            slot_1: false,
+            slot_2: false,
+            slot_3: false,
+            slot_4: false,
+            slot_5: false,
+            slot_6: false,
+            slot_7: false,
+            slot_8: false
+        },
+        {
+            email: "",
+            mobile: "",
+            overnightOptions: {
+                stayOvernight: null,
+                roomPreference: "",
+                bedLinenNeeded: null,
+            },
+            modeOfTransportation: null,
+            specialFoodNeeds: {
+                vegetarian: false,
+                otherFoodNeeds: false,
+                foodNeedsText: ""
+            },
+            joinWhatsApp: null,
+            agreeToJoin: false
+        },
+        {
+            rank_1: 0,
+            rank_2: 0,
+            rank_3: 0,
+            rank_4: 0,
+            rank_5: 0,
+            rank_6: 0,
+            rank_7: 0,
+            rank_8: 0,
+            rank_excluded: []
+        }
+    )
+    res.json(emptyPlayer);
+});
+
 app.get("/players", async (req, res) => {
-    const [players_data] = await db.query(
-        "SELECT * FROM players"
-    );
+    const data = {
+        players: [],
+        timeslots: [],
+        game_preferences: [],
+        game_preferences_excluded: []
+    };
 
-    const [timeslots_data] = await db.query(
-        "SELECT * FROM timeslots"
-    );
-
-    const [game_preferences_data] = await db.query(
-        "SELECT * FROM game_preferences"
-    );
+    for (const key in data) {
+        [data[key]] = await db.query(
+            `SELECT * FROM ${key}`
+        );
+    };
+    for (const gamePreference of data.game_preferences) {
+        const excludedGamesOfPlayer = data.game_preferences_excluded.filter(preference => preference.player_id === gamePreference.player_id);
+        gamePreference.rank_excluded = excludedGamesOfPlayer.map(preference => preference.game_id);
+    };
 
     playersList.length = 0;
-    for (const player_entry of players_data) {
-        let timeslotsOfPlayer = timeslots_data.find(timeslot => timeslot.player_id === player_entry.id);
+
+    for (const player of data.players) {
+        
+        for (const data_entry in player) {
+            if (data_entry === "id") continue;
+
+            const value = player[data_entry];
+            player[data_entry] =
+                value === 1 ? true
+                : value === 0 ? false
+                : value;
+        };
+        
+        let timeslotsOfPlayer = data.timeslots.find(timeslot => timeslot.player_id === player.id);
         if (timeslotsOfPlayer) {
             delete timeslotsOfPlayer.player_id;
+            for (timeslot in timeslotsOfPlayer) {
+                timeslotsOfPlayer[timeslot] = timeslotsOfPlayer[timeslot] === 1 ? true : false;
+            }
         } else {
             timeslotsOfPlayer = {
                 slot_all: false,
@@ -253,48 +309,48 @@ app.get("/players", async (req, res) => {
                 slot_7: false,
                 slot_8: false
             };
-        }
-        let gamePreferencesOfPlayer = game_preferences_data.find(gamePreference => gamePreference.player_id === player_entry.id);
+        };
+        let gamePreferencesOfPlayer = data.game_preferences.find(gamePreference => gamePreference.player_id === player.id);
         if (gamePreferencesOfPlayer) {
             delete gamePreferencesOfPlayer.player_id;
         } else {
             gamePreferencesOfPlayer = {
-                rank1: null,
-                rank2: null,
-                rank3: null,
-                rank4: null,
-                rank5: null,
-                rank6: null,
-                rank7: null,
-                rank8: null
+                rank_1: 0,
+                rank_2: 0,
+                rank_3: 0,
+                rank_4: 0,
+                rank_5: 0,
+                rank_6: 0,
+                rank_7: 0,
+                rank_8: 0
             };
         }
 
-        const player = new Player(
-            player_entry.id,
-            player_entry.firstName,
-            player_entry.lastName,
+        const playerEntry = new Player(
+            player.id,
+            player.firstName,
+            player.lastName,
             timeslotsOfPlayer,
             {
-                email: player_entry.email,
-                mobile: player_entry.mobile,
+                email: player.email,
+                mobile: player.mobile,
                 overnightOptions: {
-                    stayOvernight: player_entry.stayOvernight,
-                    roomPreference: player_entry.roomPreference,
-                    bedLinenNeeded: player_entry.bedLinenNeeded,
+                    stayOvernight: player.stayOvernight,
+                    roomPreference: player.roomPreference,
+                    bedLinenNeeded: player.bedLinenNeeded,
                 },
-                modeOfTransportation: player_entry.modeOfTransportation,
+                modeOfTransportation: player.modeOfTransportation,
                 specialFoodNeeds: {
-                    vegetarian: player_entry.vegetarian,
-                    otherFoodNeeds: player_entry.otherFoodNeeds,
-                    foodNeedsText: player_entry.foodNeedsText
+                    vegetarian: player.vegetarian,
+                    otherFoodNeeds: player.otherFoodNeeds,
+                    foodNeedsText: player.foodNeedsText
                 },
-                joinWhatsApp: player_entry.joinWhatsApp,
-                agreeToJoin: player_entry.agreeToJoin
+                joinWhatsApp: player.joinWhatsApp,
+                agreeToJoin: player.agreeToJoin
             },
             gamePreferencesOfPlayer
         );
-        playersList.push(player);
+        playersList.push(playerEntry);
     }
     res.json(playersList);
     
@@ -359,7 +415,6 @@ app.post("/logout", (req, res) => {
                 success: false
             });
         };
-        console.log("Destroy-Funktion!");
 
         res.clearCookie("connect.sid");
         console.log("Kekse gereinigt.");
@@ -396,32 +451,63 @@ app.get("/assess", (req, res) => {
 
 app.post("/players", async (req, res) => {
     console.log(req.body);
-    const { firstName, lastName, email, mobile, timeslots, stayOvernight, roomPreference, bedLinenNeeded,modeOfTransportation, vegetarian, otherFoodNeeds, foodNeedsText, joinWhatsApp, agreeToJoin, gamePreferences, playerId, del } = req.body;
-    const playerColumns = Object.keys(req.body).filter(
-        key => !["playerId", "del", "timeslots", "gamePreferences"].includes(key)
-    );
-    for (const key in req.body) {
-        if (typeof req.body[key] === "boolean" && key !== "del") {
-            console.log("Boolean gefunden:", key);
-            req.body[key] = req.body[key] ? 1 : 0;
-        }
+    const { firstName, lastName, email, mobile, timeslots, stayOvernight, roomPreference, bedLinenNeeded, modeOfTransportation, vegetarian, otherFoodNeeds, foodNeedsText, joinWhatsApp, agreeToJoin, gamePreferences, playerId, del } = req.body;
+    
+    let thisPlayerId = req.body.playerId;
+
+    if (thisPlayerId !== 0)  {
+        await db.query(
+            `DELETE FROM game_preferences_excluded WHERE game_id = ?`,
+            [thisPlayerId]
+        );
     };
+
     if (req.body.del) {
         const delResult = await deleteData(req.body.del, req.body.playerId, "players", "id");
         const delTimeslotsResult = await deleteData(req.body.del, req.body.playerId, "timeslots", "player_id");
         const delGamePreferencesResult = await deleteData(req.body.del, req.body.playerId, "game_preferences", "player_id");
-        res.json(delResult, delTimeslotsResult, delGamePreferencesResult);
+        console.log(delResult);
+        return res.json(delResult);
+    };
+    
+    const playerColumns = Object.keys(req.body).filter(
+        key => !["playerId", "del", "timeslots", "gamePreferences"].includes(key)
+    );
+    const timeslotColumns = ["player_id", ...Object.keys(timeslots)];
+    const gamePreferenceColumns = ["player_id", ...Object.keys(gamePreferences).filter(key => !["rank_excluded"].includes(key))];
+
+    for (const key in req.body) {
+        if (typeof req.body[key] === "boolean" && key !== "del") {
+            req.body[key] = req.body[key] ? 1 : 0;
+            continue;
+        };
+        if (key === "timeslots") {
+            for (const timeslot in req.body[key]) {
+                if (typeof req.body[key][timeslot] === "boolean") {
+                    console.log("Boolean gefunden:", key, timeslot);
+                    req.body[key][timeslot] = req.body[key][timeslot] ? 1 : 0;
+                }
+            }
+        }
     };
 
     const playerResult = await writeData(req.body, playerColumns, "players", req.body.playerId, "id");
     
+    const timeslotResult = await writeData({player_id: playerResult.newDataId, ...req.body.timeslots}, timeslotColumns, "timeslots", req.body.playerId, "player_id");
 
-    const timeslotColumns = ["player_id", ...Object.keys(timeslots).map(key => `slot_${key}`)];
-    req.body.player_id = playerResult.newDataId;
-    const timeslotResult = await writeData(req.body, timeslotColumns, "timeslots", req.body.playerId, "player_id");
+    const gamePreferenceResult = await writeData({player_id: playerResult.newDataId, ...req.body.gamePreferences}, gamePreferenceColumns, "game_preferences", req.body.playerId, "player_id");
 
-    const gamePreferenceColumns = ["player_id", ...Object.keys(gamePreferences).map(key => `rank_${key}`)];
-    const gamePreferenceResult = await writeData(req.body, gamePreferenceColumns, "game_preferences", req.body.playerId, "player_id");
+    thisPlayerId = playerResult.newDataId;
+    const values = req.body.gamePreferences.rank_excluded.map(gameId => [
+        thisPlayerId,
+        gameId
+    ]);
+    if (values.length > 0) {
+        db.query(
+            "INSERT INTO game_preferences_excluded (player_id, game_id) VALUES ?",
+            [values]
+        );
+    };
 
     res.json(playerResult);
 });
@@ -481,7 +567,6 @@ app.post("/gameCards", async (req, res) => {
     let thisGameId = req.body.dataId;
 
     const result = await writeData(req.body, gameColumns, "gameCards", thisGameId, "id");
-    console.log(result);
     res.json(result);
 });
 
@@ -505,8 +590,14 @@ app.get("/join", (req,res) => {
     res.sendFile(path.join(__dirname, "../public/join/join.html"));
 });
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("Server läuft auf Port 3000");
+app.listen(PORT, "0.0.0.0", (error) => {
+    if (error) {
+        console.error("Serverstart fehlgeschlagen:", error);
+        process.exitCode = 1;
+        return;
+    }
+
+    console.log(`Server läuft auf Port ${PORT}`);
 });
 
 //const bcrypt = require("bcrypt");

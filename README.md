@@ -76,8 +76,8 @@ Die benötigten MySQL-Tabellen müssen derzeit manuell erstellt werden. Eine kle
 
 ### Geplante nächste Schritte
 - Speicherung der Spielepräferenzen in der Datenbank
-- Erweiterung des Planungsalgorithmus um weitere Parameter
 - visuelle Darstellung des erstellten Plans
+- Erweiterung des Planungsalgorithmus um weitere Parameter
 - Personalisierte Links, über die Teilnehmende ihre Anmeldung bearbeiten können
 
 ### Mittelfristige Ziele
