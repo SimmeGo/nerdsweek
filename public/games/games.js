@@ -321,7 +321,7 @@ async function start() {
         createPreferredAndExcludedPlayerCountList();
     });
     document.getElementById("gameButtons").appendChild(addGameButton);
-    generateTableHead("gamesTableHead", fields);
+    generateTableHead("gamesTableHead", [... fields, {label: "Aktionen"}]);
     generateGamesTableBody();
 }
 

@@ -52,7 +52,7 @@ async function start() {
     await refreshValues("players");
     players = await getValues("players");
     console.log(players);
-    generateTableHead("playersTableHead", fieldsForTable);
+    generateTableHead("playersTableHead", [... fieldsForTable, {label: "Aktionen"}]);
     generatePlayersTableBody();
     const backButton = createAndShowBackButton("/admin", "playerButtons");
     const addPlayerButton = createButton("addPlayerButton", addSvg, "image", "roundButton", () => {

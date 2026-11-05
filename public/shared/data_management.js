@@ -275,6 +275,10 @@ function createTimeslots() {
         };
         const timeslotEntry = new Timeslot(timeslot, dates[timeslot - 1], startTime, null);
         timeslots.push(timeslotEntry);
-    }
+    };
+
+    const timeslotEntry = new Timeslot(0, null, null, null);
+        timeslots.push(timeslotEntry);
+
     return timeslots;
 }

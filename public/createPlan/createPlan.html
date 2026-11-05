@@ -1,6 +1,7 @@
 <head>
     <script type="module" src="/createPlan/createPlan.js" defer></script>
     <link rel="stylesheet" href="/shared/global.css">
+    <link rel="stylesheet" href="/createPlan/createPlan.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
@@ -8,14 +9,12 @@
     <h1> Nerdsweek-Planungsmodul </h1>
     <p>Hier kannst du den Zeitplan für die Nerdsweek erstellen lassen. Im Hintergrund arbeitet ein Algorithmus, der versucht, den Plan hinsichtlich Spielerpräferenzen und anderen Kriterien zu optimieren.</p>
     <div id="planButtons"></div>
-    <div id="planList">
-        <table id="planTable">
-            <thead id = "planTableHead">
-            </thead>
-            <tbody id="planTableBody">
-            </tbody>
-        </table>
-    </div>
     <div id="formContainer"></div>
-    <div id="resultContainer"></div>
+    <div id="planTable" class="plan-table">
+        <div id = "planTableHead" class="plan-table-head">
+        </div>
+        <div id="planTableBody" class="plan-table-body">
+        </div>
+    </div>
+    <div id="satisfactionOverview" class="satisfaction-overview"></div>
 </body>

@@ -1,0 +1,101 @@
+Date : 2026-11-05 09:02:57
+Directory : /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public
+Total : 61 files,  5011 codes, 176 comments, 962 blanks, all 6149 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JavaScript |         25 |      3,990 |        145 |        776 |      4,911 |
+| PostCSS    |          6 |        844 |         11 |        165 |      1,020 |
+| HTML       |          8 |        133 |         20 |         10 |        163 |
+| XML        |         22 |         44 |          0 |         11 |         55 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                            | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                               |         61 |      5,011 |        176 |        962 |      6,149 |
+| . (Files)                                                                                       |          3 |        293 |         29 |         56 |        378 |
+| ..                                                                                              |          3 |       -390 |         -4 |        -69 |       -463 |
+| ../server                                                                                       |          3 |       -390 |         -4 |        -69 |       -463 |
+| admin                                                                                           |          4 |         78 |          1 |         12 |         91 |
+| assets                                                                                          |         22 |         44 |          0 |         11 |         55 |
+| assets/icons                                                                                    |         22 |         44 |          0 |         11 |         55 |
+| createPlan                                                                                      |         10 |      2,451 |         92 |        545 |      3,088 |
+| games                                                                                           |          3 |        335 |          3 |         29 |        367 |
+| join                                                                                            |          4 |        770 |         17 |        190 |        977 |
+| login                                                                                           |          2 |         38 |          0 |          3 |         41 |
+| player                                                                                          |          2 |         78 |          0 |          8 |         86 |
+| ranking                                                                                         |          2 |        103 |          0 |         10 |        113 |
+| shared                                                                                          |          6 |      1,211 |         38 |        167 |      1,416 |
++-------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                        | language   | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/admin/admin.css                  | PostCSS    |         25 |          0 |          4 |         29 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/admin/admin.html                 | HTML       |         10 |          0 |          1 |         11 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/admin/admin.js                   | JavaScript |         24 |          1 |          4 |         29 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/admin/checkLogin.js              | JavaScript |         19 |          0 |          3 |         22 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Chevron Down.svg  | XML        |          1 |          0 |          0 |          1 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Chevron Up.svg    | XML        |          1 |          0 |          0 |          1 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Chevrons Left.svg | XML        |          1 |          0 |          0 |          1 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Heart 2.svg       | XML        |          1 |          0 |          0 |          1 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Logout.svg        | XML        |          1 |          0 |          0 |          1 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Magnifier.svg     | XML        |          1 |          0 |          0 |          1 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Pen Writing 3.svg | XML        |          1 |          0 |          0 |          1 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Plus.svg          | XML        |          1 |          0 |          0 |          1 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Settings 3.svg    | XML        |          1 |          0 |          0 |          1 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Trash.svg         | XML        |          1 |          0 |          0 |          1 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._X.svg             | XML        |          1 |          0 |          0 |          1 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Chevron Down.svg    | XML        |          3 |          0 |          1 |          4 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Chevron Up.svg      | XML        |          3 |          0 |          1 |          4 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Chevrons Left.svg   | XML        |          3 |          0 |          1 |          4 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Heart 2.svg         | XML        |          3 |          0 |          1 |          4 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Logout.svg          | XML        |          3 |          0 |          1 |          4 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Magnifier.svg       | XML        |          3 |          0 |          1 |          4 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Pen Writing 3.svg   | XML        |          3 |          0 |          1 |          4 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Plus.svg            | XML        |          3 |          0 |          1 |          4 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Settings 3.svg      | XML        |          3 |          0 |          1 |          4 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Trash.svg           | XML        |          3 |          0 |          1 |          4 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/X.svg               | XML        |          3 |          0 |          1 |          4 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/._createPlan.js       | JavaScript |          1 |          0 |          0 |          1 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/._dragAndDrop.js      | JavaScript |          1 |          0 |          0 |          1 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/._planView.js         | JavaScript |          1 |          0 |          0 |          1 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/createPlan.css        | PostCSS    |        223 |          0 |         40 |        263 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/createPlan.html       | HTML       |         19 |          0 |          1 |         20 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/createPlan.js         | JavaScript |        772 |         36 |        153 |        961 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/createPlanOld.js      | JavaScript |        887 |         36 |        169 |      1,092 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/dragAndDrop.js        | JavaScript |        174 |          1 |         60 |        235 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/dragAndDropOld.js     | JavaScript |         65 |         14 |         25 |        104 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/planView.js           | JavaScript |        308 |          5 |         97 |        410 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/games/games.css                  | PostCSS    |          8 |          0 |          4 |         12 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/games/games.html                 | HTML       |         24 |          0 |          3 |         27 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/games/games.js                   | JavaScript |        303 |          3 |         22 |        328 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/index.css                        | PostCSS    |        190 |          4 |         32 |        226 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/index.html                       | HTML       |         15 |         17 |          1 |         33 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/index.js                         | JavaScript |         88 |          8 |         23 |        119 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/join/join.css                    | PostCSS    |        196 |          3 |         44 |        243 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/join/join.html                   | HTML       |         12 |          3 |          1 |         16 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/join/join.js                     | JavaScript |        420 |         11 |        113 |        544 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/join/loadRiveButtons.js          | JavaScript |        142 |          0 |         32 |        174 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/login/login.html                 | HTML       |         15 |          0 |          1 |         16 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/login/login.js                   | JavaScript |         23 |          0 |          2 |         25 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/player/player.html               | HTML       |         19 |          0 |          1 |         20 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/player/player.js                 | JavaScript |         59 |          0 |          7 |         66 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/ranking/ranking.html             | HTML       |         19 |          0 |          1 |         20 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/ranking/ranking.js               | JavaScript |         84 |          0 |          9 |         93 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/shared/css_coding.js             | JavaScript |         17 |          0 |          2 |         19 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/shared/data_management.js        | JavaScript |        229 |         24 |         31 |        284 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/shared/forms.js                  | JavaScript |        581 |          4 |         60 |        645 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/shared/global.css                | PostCSS    |        202 |          4 |         41 |        247 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/shared/nerdy.js                  | JavaScript |         70 |          4 |         21 |         95 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/shared/user_management.js        | JavaScript |        112 |          2 |         12 |        126 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/server/._index.js                       | JavaScript |         -1 |          0 |          0 |         -1 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/server/database.js                      | JavaScript |        -10 |          0 |         -3 |        -13 |
+| /Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/server/index.js                         | JavaScript |       -379 |         -4 |        -66 |       -449 |
+| Total                                                                                           |            |      5,011 |        176 |        962 |      6,149 |
++-------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

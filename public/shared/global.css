@@ -17,6 +17,7 @@ img, video, iframe {
     --primColLight: #98dcc7;
     --primColLighter: #a0eadf;
     --bgCol: #905AEE;
+    --bgColDark: #161616;
     --bgColLight: #b29bd9;
     font-family: "Type Light Sans";
 }
@@ -116,35 +117,35 @@ select {
 
 /* table appearence */
 
-table {
+.normalTable {
     width: 100%;
     border-collapse: collapse;
     background-color: black;
     color: var(--primCol);
 }
 
-th,
+.normalTable th,
 td {
     padding: 0.77rem;
     text-align: center;
     border-bottom: 2px solid var(--primCol);
 }
 
-th {
+.normalTable th {
     color: var(--primCol);
     background-color: var(--bgCol);
     position: sticky;
 }
 
-tr:nth-child(even) {
+.normalTable tr:nth-child(even) {
     background-color: rgb(74, 73, 73);
 }
 
-tr:hover {
+.normalTable tr:hover {
     background-color: var(--bgCol);
 }
 
-table button {
+.normalTable table button {
     margin-right: 10px;
 }
 

@@ -1,0 +1,63 @@
+"filename", "language", "JavaScript", "HTML", "PostCSS", "XML", "comment", "blank", "total"
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/admin/admin.css", "PostCSS", 0, 0, -25, 0, 0, -4, -29
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/admin/admin.html", "HTML", 0, -10, 0, 0, 0, -1, -11
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/admin/admin.js", "JavaScript", -24, 0, 0, 0, -1, -4, -29
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/admin/checkLogin.js", "JavaScript", -19, 0, 0, 0, 0, -3, -22
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Chevron Down.svg", "XML", 0, 0, 0, -1, 0, 0, -1
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Chevron Up.svg", "XML", 0, 0, 0, -1, 0, 0, -1
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Chevrons Left.svg", "XML", 0, 0, 0, -1, 0, 0, -1
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Heart 2.svg", "XML", 0, 0, 0, -1, 0, 0, -1
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Logout.svg", "XML", 0, 0, 0, -1, 0, 0, -1
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Magnifier.svg", "XML", 0, 0, 0, -1, 0, 0, -1
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Pen Writing 3.svg", "XML", 0, 0, 0, -1, 0, 0, -1
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Plus.svg", "XML", 0, 0, 0, -1, 0, 0, -1
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Settings 3.svg", "XML", 0, 0, 0, -1, 0, 0, -1
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._Trash.svg", "XML", 0, 0, 0, -1, 0, 0, -1
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/._X.svg", "XML", 0, 0, 0, -1, 0, 0, -1
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Chevron Down.svg", "XML", 0, 0, 0, -3, 0, -1, -4
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Chevron Up.svg", "XML", 0, 0, 0, -3, 0, -1, -4
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Chevrons Left.svg", "XML", 0, 0, 0, -3, 0, -1, -4
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Heart 2.svg", "XML", 0, 0, 0, -3, 0, -1, -4
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Logout.svg", "XML", 0, 0, 0, -3, 0, -1, -4
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Magnifier.svg", "XML", 0, 0, 0, -3, 0, -1, -4
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Pen Writing 3.svg", "XML", 0, 0, 0, -3, 0, -1, -4
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Plus.svg", "XML", 0, 0, 0, -3, 0, -1, -4
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Settings 3.svg", "XML", 0, 0, 0, -3, 0, -1, -4
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/Trash.svg", "XML", 0, 0, 0, -3, 0, -1, -4
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/assets/icons/X.svg", "XML", 0, 0, 0, -3, 0, -1, -4
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/._createPlan.js", "JavaScript", -1, 0, 0, 0, 0, 0, -1
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/._dragAndDrop.js", "JavaScript", -1, 0, 0, 0, 0, 0, -1
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/._planView.js", "JavaScript", -1, 0, 0, 0, 0, 0, -1
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/createPlan.css", "PostCSS", 0, 0, -223, 0, 0, -40, -263
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/createPlan.html", "HTML", 0, -19, 0, 0, 0, -1, -20
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/createPlan.js", "JavaScript", -772, 0, 0, 0, -36, -153, -961
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/createPlanOld.js", "JavaScript", -887, 0, 0, 0, -36, -169, -1092
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/dragAndDrop.js", "JavaScript", -174, 0, 0, 0, -1, -60, -235
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/dragAndDropOld.js", "JavaScript", -65, 0, 0, 0, -14, -25, -104
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/createPlan/planView.js", "JavaScript", -308, 0, 0, 0, -5, -97, -410
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/games/games.css", "PostCSS", 0, 0, -8, 0, 0, -4, -12
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/games/games.html", "HTML", 0, -24, 0, 0, 0, -3, -27
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/games/games.js", "JavaScript", -303, 0, 0, 0, -3, -22, -328
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/index.css", "PostCSS", 0, 0, -190, 0, -4, -32, -226
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/index.html", "HTML", 0, -15, 0, 0, -17, -1, -33
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/index.js", "JavaScript", -88, 0, 0, 0, -8, -23, -119
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/join/join.css", "PostCSS", 0, 0, -196, 0, -3, -44, -243
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/join/join.html", "HTML", 0, -12, 0, 0, -3, -1, -16
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/join/join.js", "JavaScript", -420, 0, 0, 0, -11, -113, -544
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/join/loadRiveButtons.js", "JavaScript", -142, 0, 0, 0, 0, -32, -174
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/login/login.html", "HTML", 0, -15, 0, 0, 0, -1, -16
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/login/login.js", "JavaScript", -23, 0, 0, 0, 0, -2, -25
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/player/player.html", "HTML", 0, -19, 0, 0, 0, -1, -20
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/player/player.js", "JavaScript", -59, 0, 0, 0, 0, -7, -66
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/ranking/ranking.html", "HTML", 0, -19, 0, 0, 0, -1, -20
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/ranking/ranking.js", "JavaScript", -84, 0, 0, 0, 0, -9, -93
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/shared/css_coding.js", "JavaScript", -17, 0, 0, 0, 0, -2, -19
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/shared/data_management.js", "JavaScript", -229, 0, 0, 0, -24, -31, -284
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/shared/forms.js", "JavaScript", -581, 0, 0, 0, -4, -60, -645
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/shared/global.css", "PostCSS", 0, 0, -202, 0, -4, -41, -247
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/shared/nerdy.js", "JavaScript", -70, 0, 0, 0, -4, -21, -95
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/public/shared/user_management.js", "JavaScript", -112, 0, 0, 0, -2, -12, -126
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/server/._index.js", "JavaScript", 1, 0, 0, 0, 0, 0, 1
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/server/database.js", "JavaScript", 10, 0, 0, 0, 0, 3, 13
+"/Volumes/Speeddata/Programmierprojekte/Nerdsweek-Webapp/server/index.js", "JavaScript", 517, 0, 0, 0, 4, 94, 615
+"Total", "-", -3852, -133, -844, -44, -176, -934, -5983

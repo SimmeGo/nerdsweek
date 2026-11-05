@@ -5,6 +5,7 @@ export function createButton(id, label, contentType, cssClass, onClick) {
     button.id = id;
     //button.textContent = label;
     button.className = cssClass;
+    button.type = "button";
     button.addEventListener("click", onClick);
     let content;
     if (contentType === "text") {
@@ -515,15 +516,14 @@ export function generateTableHead(tableHeadID, fields, values, tableFunction) {
     fields.forEach(field => {
         const cellElement = document.createElement("th");
         cellElement.textContent = field.label;
-        cellElement.addEventListener("click", () => {
-            const sortedValues = values.sort(field.sort);
-            tableFunction(sortedValues);
-        });
+        if (typeof tableFunction === "function") {
+            cellElement.addEventListener("click", () => {
+                const sortedValues = typeof values.sort === "function" ? values.sort(field.sort) : values;
+                tableFunction(sortedValues);
+            });
+        }
         headTr.appendChild(cellElement);
     });
-    const cellElement = document.createElement("th");
-        cellElement.textContent = "Aktionen";
-        headTr.appendChild(cellElement);
     tableHead.appendChild(headTr);
 }
 
@@ -531,7 +531,7 @@ export async function generateTableBody(tableBodyID, dataType, buttons, fields, 
     const tableBody = document.getElementById(tableBodyID);
     let translatedValues = [];
     let values;
-    //const response = await fetch(fetchDestination);
+
     tableBody.innerHTML = "";
     if (Array.isArray(dataType)) {
         values = dataType;
@@ -545,20 +545,24 @@ export async function generateTableBody(tableBodyID, dataType, buttons, fields, 
     } else {
         translatedValues = values;
     }
+    
     translatedValues.forEach(value => {
-        const column = document.createElement("tr");
+        const row = document.createElement("tr");
         fields.forEach(getValue => {
             const cellElement = document.createElement("td");
-            cellElement.textContent = getValue.get(value) ?? "";
-            column.appendChild(cellElement);
+            const cellContent = getValue.get(value) ?? "";
+            cellElement.textContent = cellContent;
+            row.appendChild(cellElement);
             });
-        const cellElement = document.createElement("td");
-        buttons.forEach(button => {
-            const newButton = createButton(button.name, button.label, button.contentType, "", () => button.function(value));
-            cellElement.appendChild(newButton);
-            })
-        column.appendChild(cellElement);
-        tableBody.appendChild(column);
+        if (buttons.length > 0) {
+            const cellElement = document.createElement("td");
+            buttons.forEach(button => {
+                const newButton = createButton(button.name, button.label, button.contentType, "", () => button.function(value));
+                cellElement.appendChild(newButton);
+                })
+            row.appendChild(cellElement);
+        };
+        tableBody.appendChild(row);
     });
     return translatedValues;
 }
@@ -588,12 +592,12 @@ export function calculateRatings(games, players) {
         let points = 0;
         let playersChoseThisGame = [];
         players.forEach(player => {
-            const ranks = Object.fromEntries(Object.entries(player).filter(
-                ([key]) => key.includes("rank")
+            const ranks = Object.fromEntries(Object.entries(player.gamePreferences).filter(
+                key => !["rank_excluded"].includes(key)
             ));
             for (const [key, value] of Object.entries(ranks)) {
                 if (value === game.id) {
-                    const rankNumber = Number(key.replace("rank", ""));
+                    const rankNumber = Number(key.replace("rank_", ""));
                     const pointsOfPlayer = calculateRankingScoreForPlayer(rankNumber);
                     points = points + pointsOfPlayer;
                     playersChoseThisGame.push({

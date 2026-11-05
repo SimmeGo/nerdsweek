@@ -9,30 +9,30 @@ let values = [];
 const containerID = "formContainer";
 
 const fields = [
-        {
-            label: "ID",
-            name: "id",
-            get: ranking => ranking.id,
-            sort: (a, b) => a.id - b.id
-        },
-        { 
-            label: "Spiel", 
-            name: "game",
-            get: ranking => ranking.title, 
-            sort: (a, b) => a.title.localeCompare(b.title)
-        },
-        { 
-            label: "Punkte", 
-            name: "points",
-            get: ranking => ranking.rating,
-            sort: (a, b) => b.rating - a.rating
-        },
-        { 
-            label: "Anzahl der Spieler", 
-            name: "playerChoiceCount",
-            get: ranking => ranking.playerCount,
-            sort: (a, b) => b.playerCount - a.playerCount
-        }
+    {
+        label: "ID",
+        name: "id",
+        get: ranking => ranking.id,
+        sort: (a, b) => a.id - b.id
+    },
+    { 
+        label: "Spiel", 
+        name: "game",
+        get: ranking => ranking.title, 
+        sort: (a, b) => a.title.localeCompare(b.title)
+    },
+    { 
+        label: "Punkte", 
+        name: "points",
+        get: ranking => ranking.rating,
+        sort: (a, b) => b.rating - a.rating
+    },
+    { 
+        label: "Anzahl der Spieler", 
+        name: "playerChoiceCount",
+        get: ranking => ranking.playerCount,
+        sort: (a, b) => b.playerCount - a.playerCount
+    }
 ];
 
 const rankingTableButtons = [
@@ -41,11 +41,15 @@ const rankingTableButtons = [
 
 function showPlayersOfGame(gameId) {
     const playersOfGame = ratings[1][gameId];
-    const playerNames = playersOfGame.map(playerOfGame => {
-        const player = players.find(p => p.id === playerOfGame.playerId);
-        return `${player.firstName} ${player.lastName} - Rang ${playerOfGame.rank}`;
-    });
-    alert(`Spieler, die dieses Spiel gewählt haben:\n\n${playerNames.join("\n")}`);
+    if (!playersOfGame) {
+        return alert("Dieses Spiel wurde von keinem Spieler gewählt.");
+    } else {
+        const playerNames = playersOfGame.map(playerOfGame => {
+            const player = players.find(p => p.id === playerOfGame.playerId);
+            return `${player.firstName} ${player.lastName} - Rang ${playerOfGame.rank}`;
+        });
+        return alert(`Spieler, die dieses Spiel gewählt haben:\n\n${playerNames.join("\n")}`);
+    }
 }
 
 function generateRankingTableBody(values) {
@@ -63,9 +67,10 @@ function createTableValues() {
         object["rating"] = Object.entries(gamesRating).find(
             ([key, value]) => Number(key) === game.id
         )?.[1];
-        object["playerCount"] = Object.entries(playersChoseGame).find(
+        const playerCount = Object.entries(playersChoseGame).find(
             ([key, value]) => Number(key) === game.id
         )?.[1].length;
+        object["playerCount"] = playerCount ? playerCount : 0;
         values.push(object);
     })
     return values;
@@ -80,7 +85,7 @@ async function start() {
     values = createTableValues();
     console.log(players);
     console.log(games);
-    generateTableHead("rankingTableHead", fields, values, generateRankingTableBody);
+    generateTableHead("rankingTableHead", [... fields, {label: "Aktionen"}], values, generateRankingTableBody);
     generateRankingTableBody(values);
     const backButton = createAndShowBackButton("/admin", "rankingButtons");
 }

@@ -37,6 +37,11 @@ const PLAYER_COUNT = {
 
 };
 
+const min = 50;
+const max = 205;
+
+const randomColorValue = () => Math.floor(Math.random() * (max - min + 1)) + min;
+
 class Game {
 
     constructor(id, title, playerCount, duration, explainingTime, tableCount, type) {
@@ -70,6 +75,7 @@ class Player {
         this.timeslots = availableTimeslots;
         this.data = data;
         this.gamePreferences = gamePreferences;
+        this.color = `rgb(${randomColorValue()}, ${randomColorValue()}, ${randomColorValue()})`;
         
     }
 }
