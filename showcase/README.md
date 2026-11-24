@@ -23,7 +23,7 @@ Der User kann sich über diese Seite zur nächsten Nerdsweek anmelden und wird d
 
 Am Ende der Join-Page findet sich die Spieleauswahl, bei der bis zu acht Spielefavoriten in einer individuellen Rangfolge ausgewählt werden können. Der Fokus liegt hier auf einer guten Übersicht aller verfügbaren Spiele. Die Cover regen auch dazu an, Spiele näher zu betrachten, die noch unbekannt sind. Nach erfolgter Spielauswahl ist gut nachzuvollziehen, welche Spiele ausgewählt wurden – eine nachträgliche Korrektur ist auch simpel möglich.
 
-[![Die Spieleauswahl](/showcase/screenshots/Anmeldung_AuswahlDerSpielepräferenzen.png)](/showcase/videos/SpieleauswahlImRahmenDerAnmeldung.mov)
+[![Die Spieleauswahl](/showcase/screenshots/Anmeldung_AuswahlDerSpielepräferenzen.png)](/showcase/videos/SpieleauswahlImRahmenDerAnmeldung.mp4)
 
 (Ein Klick auf das Bild öffnet ein Video der interaktiven Spieleauswahl.)
 
@@ -43,7 +43,7 @@ Admins erhalten Einblick in die Anmeldungen und können diese nachträglich lös
 
 Der erstellte Plan kann nachträglich via Drag and Drop bearbeitet werden. Die farbliche Zuordnung der Teilnehmenden ermöglicht es, deren Verteilung über die verschiedenen Zeitslots hinweg schnell zu erfassen. Farbige Umrandungen der Spielerkacheln bei Unstimmigkeiten und die kontinuierlich aktualisierte Zufriedenheitsübersicht geben dem Admin bei der Bearbeitung unmittelbares visuelles Feedback. Auch die Kacheln jeder Spielpartie sind farblich unterschiedlich umrandet, je nachdem, ob die Spielerzahl zum betreffenden Spiel passt (grün = bevorzugt, gelb = in Ordnung/keine präferierte Spielerzahl angegeben, rot = Spielerzahl für das Spiel ungeeignet).
 
-[![Tabellarische Übersicht des erstellten Plans](/showcase/screenshots/ErstellterPlan.png)](/showcase/videos/PlanerstellungUndInteraktiveNachbearbeitung.mov)
+[![Tabellarische Übersicht des erstellten Plans](/showcase/screenshots/ErstellterPlan.png)](/showcase/videos/PlanerstellungUndInteraktiveNachbearbeitung.mp4)
 
 (Ein Klick auf das Bild öffnet ein Video, in dem die Planerstellung und die nachträgliche interaktive Bearbeitungsoption gezeigt wird.)
 
