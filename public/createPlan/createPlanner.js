@@ -6,8 +6,8 @@ export function createPlanner({ players, games, TIMESLOTS, calculateSatisfaction
 
 
     const playGenerator = createPlayGenerator({ games, players });
-
-    function generateAndCyclePlans(cycleCount, /*showProgress*/) {
+    
+    async function generateAndCyclePlans(cycleCount, showProgress) {
         let bestPlan = null;
         let isNewPlan = false;
     
@@ -16,14 +16,18 @@ export function createPlanner({ players, games, TIMESLOTS, calculateSatisfaction
     
             bestPlan = analysePlan(currentPlan, bestPlan, cycleNumber);
     
-            /*if (!isNewPlan) isNewPlan = bestPlan === currentPlan;
+            if (!isNewPlan) isNewPlan = bestPlan === currentPlan;
     
-            if ((cycleNumber + 1) % 25 === 0 || cycleNumber + 1 === cycleCount) {
+            if ((cycleNumber + 1) % 10 === 0 || cycleNumber + 1 === cycleCount) {
                 showProgress(cycleNumber + 1, cycleCount, bestPlan, isNewPlan);
                 isNewPlan = false;
-            };*/
+
+                await new Promise(resolve => setTimeout(resolve, 0));
+            };
             if (cycleNumber + 1 === cycleCount) console.log(cycleNumber + 1);
         };
+        showProgress(100, 100, bestPlan, isNewPlan);
+
         return bestPlan;
     }
     
@@ -34,7 +38,7 @@ export function createPlanner({ players, games, TIMESLOTS, calculateSatisfaction
         } else if (comparePlans(bestPlan, currentPlan)) {
             bestPlan = currentPlan;
             reportInbetweenResult(bestPlan, i);
-        }
+        };
         return bestPlan;
     }
     

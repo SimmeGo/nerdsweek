@@ -10,7 +10,7 @@ const buttons = [
     {name: "viewRankingsButton", label: "Spiele\u200Branking ansehen", contentType: "text", class: "", relocate: () => {window.location.href = "/admin/spieleranking"}},
     {name: "planNerdsweekButton", label: "Nerdsweek planen", contentType: "text", class: "", relocate: () => {window.location.href = "/admin/nerdsweekplanung"}},
     {name: "logoutButton", label: logoutSvg, contentType: "image", class: "", relocate: async () => {logoutUser()}}
-]
+];
 
 function buildUpSite() {
     const buttonContainer = document.createElement("div");

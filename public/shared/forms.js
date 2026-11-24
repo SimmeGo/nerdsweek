@@ -252,7 +252,7 @@ function createFieldsForPersonalData() {
 
 async function createFieldsForLogistics() {
     await refreshValues("timeslots");
-    const timeslots = await getValues("timeslots");
+    const timeslots = await getValues("timeslots").filter(timeslot => timeslot.id !== 0);
     let fields = [
         { 
             element: "fieldset",

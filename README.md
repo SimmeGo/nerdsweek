@@ -1,5 +1,5 @@
 # Nerdsweek-Webapp
-Diese Webapp dient dazu, das mehrtägige Brettspielevent Nerdsweek besser zu organiseren und zu planen. Künftig soll sie Aufgaben wie Anmeldung, Brettspielverwaltung und Erstellung von Plänen übernehmen.
+Diese Webapp dient dazu, das mehrtägige Brettspielevent Nerdsweek besser zu organiseren und zu planen. Künftig soll sie Aufgaben wie Anmeldung, Brettspielverwaltung und Erstellung von Plänen übernehmen. Eine umfangreichere Demo des Designs und der Funktionen ist [hier](/showcase/README.md) zu finden.
 
 ![Startseite der Nerdsweek](/images/Startseite_Nerdsweek.png)
 

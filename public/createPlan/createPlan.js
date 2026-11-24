@@ -2,7 +2,6 @@ import { getValuesfromForm } from "../shared/data_management.js";
 import { createButton, generateForm, createAndShowBackButton, calculateAverage } from "../shared/forms.js";
 import { createPlanEvaluator } from "./createPlanEvaluator.js";
 import { createPlanner } from "./createPlanner.js";
-import { initializeEditActions } from "./editActions.js";
 
 import { createPlanView } from "./planView.js";
 import { getValues, refreshValues } from "/shared/data_management.js";
@@ -29,20 +28,101 @@ let planView;
 
 let TIMESLOTS;
 
-const containerId = "formContainer";
-const fields = [
-    {
-        element: "number",
-        label: "Anzahl an Durchläufen",
-        name: "cycleCount",
-    }
+let progressBar;
+let progressText;
+
+const buttons = [
+    {name: "manualPlan", label: "Plan manuell erstellen", contentType: "text", class: "", method: {}},
+    {name: "automatedPlan", label: "Plan erstellen lassen", contentType: "text", class: "", method: showPlanClosenessPreference},
+    {name: "loadPlan", label: "erstellten Plan laden", contentType: "text", class: "", method: {}},
 ];
 
-function startAlgorithm() {
-    const cycleCount = getValuesfromForm(fields);
-    const bestPlan = planner.generateAndCyclePlans(cycleCount);
+const backSvg = "M17.6 5.8 11.5 12l6.1 6.2m-5-12.4L6.5 12l6.1 6.2";
+
+async function startAlgorithm(closenessValue) {
+
+    const container = document.getElementById("buttonContainer");
+    container.appendChild(progressBar);
+    container.appendChild(progressText);
+
+    const algorithmButton = document.getElementById("startAlgorithmButton");
+    algorithmButton.disabled = true;
+    
+    const cycleCountValues = new Map([
+        ["1", 100],
+        ["2", 1000],
+        ["3", 5000],
+        ["4", 10000]
+    ]);
+
+    const cycleCount = cycleCountValues.get(closenessValue);
+    const bestPlan = await planner.generateAndCyclePlans(cycleCount, showProgress);
     
     planView.displayResultsInTable(bestPlan);
+
+    algorithmButton.disabled = false;
+}
+
+function showProgress(cycleNumber, cycleCount, bestPlan, isNewPlan) {
+    const progress = cycleNumber / cycleCount * 100;
+    progressBar.style.setProperty("--progress", `${progress}%`);
+    if (!isNewPlan) return;
+    progressText.textContent = `Neuer Plan gefunden, Ø-Zufriedenheit: ${Math.round(bestPlan.averageSatisfaction * 100) / 100}%`;
+}
+
+function showPlanClosenessPreference(sliderContainer) {
+    sliderContainer.innerHTML = "";
+    sliderContainer.className = "black-box slider-container";
+
+    
+    
+    const closenessLabel = document.createElement("label");
+    closenessLabel.className = "slider-wrapper";
+
+    const labelText = document.createElement("span");
+    //labelText.textContent = "Mach die Planerstellung";
+    closenessLabel.appendChild(labelText);
+    
+    const closenessSlider = document.createElement("input");
+    closenessSlider.id = "closenessSlider";
+    closenessSlider.className = "closeness-slider";
+    closenessSlider.type = "range";
+    closenessSlider.min = 1;
+    closenessSlider.max = 4;
+    closenessSlider.value = 1;
+    closenessSlider.step = 1;
+    
+    closenessLabel.appendChild(closenessSlider);
+    
+    const sliderLabels = [
+        "sehr schnell",
+        "schnell",
+        "gründlich",
+        "sehr gründlich"
+    ];
+
+    const labelsWrapper = document.createElement("div");
+    labelsWrapper.className = "labels-wrapper";
+
+    sliderLabels.forEach(label => {
+        const span = document.createElement("span");
+        span.textContent = label;
+        span.className = "slider-label";
+        labelsWrapper.appendChild(span);
+    });
+
+    closenessLabel.appendChild(labelsWrapper);
+
+    sliderContainer.appendChild(closenessLabel);
+
+    const startAlgorithmButton = createButton("startAlgorithmButton", "Plan erstellen", "text", "start-algorithm", () => {startAlgorithm(closenessSlider.value)});
+    sliderContainer.appendChild(startAlgorithmButton);
+
+    const backOneStepButton = document.getElementById("backOneStepButton");
+    backOneStepButton.style.display = "block";
+
+    const title = document.getElementById("menuTitle");
+    title.textContent = "Wie soll der Plan erstellt werden?";
 }
 
 async function start() {
@@ -61,9 +141,6 @@ async function start() {
     planEvaluator = createPlanEvaluator({ games, players, TIMESLOTS });
     planner = createPlanner( { players, games, TIMESLOTS, calculateSatisfactionScore: planEvaluator.calculateSatisfactionScore});
 
-    generateForm(fields, containerId);
-    const startAlgorithmButton = createButton("startAlgorithm", "Starte Algorithmus", "text", "", () => {startAlgorithm()});
-    document.getElementById(containerId).appendChild(startAlgorithmButton);
     const backButton = createAndShowBackButton("/admin", "planButtons");
 
     planView = createPlanView({
@@ -73,6 +150,54 @@ async function start() {
         gameCards,
         calculateSatisfactionScore: planEvaluator.calculateSatisfactionScore,
     });
+    const startContainer = document.createElement("div");
+    startContainer.className = "start-container";
+    const titleContainer = document.createElement("div");
+    titleContainer.className = "title-container";
+
+    const buttonContainer = document.createElement("div");
+    buttonContainer.id = "buttonContainer";
+    
+    const backButtonContainer = document.createElement("div");
+    const backOneStepButton = createButton("backOneStepButton", backSvg, "image", "menu-button", () => {createPlanOptions(startContainer, buttonContainer)});
+    titleContainer.appendChild(backButtonContainer);
+    backButtonContainer.appendChild(backOneStepButton);
+    backOneStepButton.style.display = "none";
+
+    const title = document.createElement("h2");
+    title.id = "menuTitle";
+    titleContainer.appendChild(title);
+    startContainer.appendChild(titleContainer);
+
+    document.getElementById("planBody").insertBefore(startContainer, document.getElementById("displayOptions"));
+
+    const otherButtonContainer = document.createElement("div");
+    titleContainer.appendChild(otherButtonContainer);
+
+    progressBar = document.createElement("div");
+    progressBar.id = "progressBar";
+    progressBar.className = "progress-bar";
+    progressText = document.createElement("span");
+    progressText.id = "progressText";
+    progressText.className = "progress-text";
+
+    createPlanOptions(startContainer, buttonContainer);
+
+}
+
+function createPlanOptions(startContainer, buttonContainer) {
+    const title = document.getElementById("menuTitle");
+    title.textContent = "Was möchtest du tun?";
+
+    buttonContainer.innerHTML = "";
+
+    buttonContainer.className = "button-container";
+    buttons.forEach(button => {
+        const newButton = createButton(button.name, button.label, button.contentType, button.class, () => button.method(buttonContainer));
+        newButton.className = "menu-button";
+        buttonContainer.appendChild(newButton);
+    });
+    startContainer.appendChild(buttonContainer);
 }
 
 start();

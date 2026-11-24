@@ -17,7 +17,8 @@ img, video, iframe {
     --primColLight: #98dcc7;
     --primColLighter: #a0eadf;
     --bgCol: #905AEE;
-    --bgColDark: #161616;
+    --bgColDark: #501c72;
+    --bgColDarker: #26192a;
     --bgColLight: #b29bd9;
     font-family: "Type Light Sans";
 }
@@ -34,7 +35,7 @@ button {
     color: var(--primCol);
     border: 0.5rem solid var(--primCol);
     box-sizing: border-box;
-    box-shadow: 0.25rem 0.25rem 0 var(--bgCol);
+    box-shadow: 0.25rem 0.25rem 0 var(--bgColDark);
     font-family: "Type Light Sans";
     font-size: 20px;
     display: inline-flex;
@@ -46,6 +47,7 @@ button {
 button:hover {
     color: var(--bgCol);
     background-color: var(--primCol);
+    border: 0.5rem solid var(--bgCol);
 }
 
 button span {
@@ -173,8 +175,8 @@ input, select, textarea {
     border-radius: 0;
 }
 
-input:read-only,
-textarea:read-only {
+input[read-only],
+textarea[read-only] {
     background-color: #b3a5a6;
 }
 
@@ -244,4 +246,9 @@ input:focus-visible {
         3px calc(100% - 3px),
         0 100%
     );
+}
+
+.menu-button {
+    height: 100%;
+    font-size: 35px;
 }

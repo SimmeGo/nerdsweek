@@ -96,7 +96,7 @@ export function createPlanView({ games, players, timeslots, gameCards, calculate
         zoomContainer.id = "zoomContainer";
         zoomContainer.className = "zoom-container";
         zoomContainer.appendChild(zoomLabel);
-        document.getElementById("formContainer").appendChild(zoomContainer);
+        document.getElementById("displayOptions").appendChild(zoomContainer);
     }
 
     function classifyPlayers(types, plays) {

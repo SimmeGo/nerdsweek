@@ -1,8 +1,161 @@
 @import url("../shared/global.css");
 
+@property --progress {
+    syntax: "<percentage>";
+    inherits: false;
+    initial-value: 0%;
+}
+
 :root {
     --columnCount: 1;
     --players-per-row: 2;
+}
+
+.start-container {
+    display: grid;
+    gap: 0;
+    margin: 1rem;
+    margin-inline: auto;
+    max-width: 1200px;
+    width: 100%;
+    aspect-ratio: 4 / 1;
+}
+
+.title-container {
+    background-color: var(--primCol);
+    color: black;
+    border: 0.5rem solid var(--primCol);
+    box-shadow: 0.25rem 0.25rem 0 var(--bgColDark);
+    display: grid;
+    grid-auto-flow: row;
+    grid-template-columns: 0.2fr 0.6fr 0.2fr;
+}
+
+.button-container {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+    margin-inline: auto;
+    max-width: 1200px;
+    width: 100%;
+    aspect-ratio: 4 / 1;
+}
+
+.title-container .menu-button {
+    width: 100%;
+}
+
+.black-box {
+    background-color: black;
+    color: var(--primCol);
+    border: 0.5rem solid var(--primCol);
+    box-shadow: 0.25rem 0.25rem 0 var(--bgColDark);
+    margin: 1rem;
+}
+
+.title-container > h2 {
+    text-align: center;
+    font-size: 40px;
+}
+
+.slider-wrapper {
+    position: relative;
+    --thumb-size: 16px;
+    width: 65%;
+    display: grid;
+    grid-auto-rows: 1fr;
+    grid-auto-flow: row;
+    margin-inline: auto;
+    margin: 1rem auto;
+}
+
+.labels-wrapper {
+    position: relative;
+    margin-inline: calc(var(--thumb-size) / 2);
+}
+
+.slider-label {
+    position: absolute;
+    transform: translateX(-50%);
+    text-align: center;
+    white-space: nowrap;
+}
+
+@media (max-width: 800px) {
+    .slider-label {
+        white-space: inherit;
+    }
+}
+
+.closeness-slider {
+    --thumb-size: 16px;
+    --track-color: #bbb;
+
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    height: 24px;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+/* Chrome, Edge und Safari */
+.closeness-slider::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--bgCol);
+}
+
+.closeness-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: var(--thumb-size);
+    height: var(--thumb-size);
+    margin-top: -6px;
+    border: none;
+    border-radius: 50%;
+    background: var(--primCol);
+}
+
+/* Firefox */
+.closeness-slider::-moz-range-track,
+.closeness-slider::-moz-range-progress {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--track-color);
+}
+
+.closeness-slider::-moz-range-thumb {
+    width: var(--thumb-size);
+    height: var(--thumb-size);
+    border: none;
+    border-radius: 50%;
+    background: #444;
+}
+
+.slider-label:nth-child(1) { left: 0%; }
+.slider-label:nth-child(2) { left: calc(100% / 3); }
+.slider-label:nth-child(3) { left: calc(200% / 3); }
+.slider-label:nth-child(4) { left: 100%; }
+
+.start-algorithm {
+    margin: 1rem;
+}
+
+.black-box > #progressBar {
+    border: 0.3rem solid var(--primCol);
+    border-radius: 1rem;
+    width: 90%;
+    margin-inline: auto;
+    min-height: 3rem;
+    background: #2A7B9B;
+    background: linear-gradient(90deg, var(--bgCol) 0% var(--progress), #00000000 var(--progress) 100%);
+    transition: --progress 0.1s linear;
+}
+
+.progress-text {
+    margin-left: 4rem;
+    color: var(--bgCol);
 }
 
 .zoom-container {
@@ -93,7 +246,7 @@
     justify-content: center;
     padding: 0.5rem;
     border-radius: 2rem;
-    background-color: var(--bgColDark);
+    background-color: var(--bgColDarker);
     color: white;
     overflow: hidden;
 }
