@@ -25,6 +25,8 @@ Am Ende der Join-Page findet sich die Spieleauswahl, bei der bis zu acht Spielef
 
 [![Die Spieleauswahl](/showcase/screenshots/Anmeldung_AuswahlDerSpielepräferenzen.png)](/showcase/videos/SpieleauswahlImRahmenDerAnmeldung.mp4)
 
+https://github.com/SimmeGo/nerdsweek/raw/refs/heads/main/showcase/videos/SpieleauswahlImRahmenDerAnmeldung.mp4
+
 (Ein Klick auf das Bild öffnet ein Video der interaktiven Spieleauswahl.)
 
 ## Admin-Zugang
